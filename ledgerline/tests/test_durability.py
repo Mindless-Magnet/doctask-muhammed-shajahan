@@ -23,6 +23,7 @@ from ledgerline.service import (
     decide_items,
     execute_run,
     requeue_stale_runs,
+    resume_strategy,
 )
 from tests.conftest import INVOICE_TEXT, MSA_TEXT, Corpus
 
@@ -131,6 +132,43 @@ def test_a_resumed_run_reaches_the_same_result_as_an_uninterrupted_one(env, corp
     assert resumed == uninterrupted
 
 
+# --------------------------------------------------------------------------------------------
+# Resume decision
+# --------------------------------------------------------------------------------------------
+
+# No database, no subprocess: unit-level coverage for the exact defect the two tests above found
+# only intermittently (one run in several dozen, under a real SIGKILL). Instrumenting a real kill
+# to land at the SQLite checkpointer's specific internal commit boundary is exactly as fragile as
+# it sounds; testing the decision `execute_run` makes from a snapshot shape is not, and it is the
+# decision that was wrong. See `resume_strategy`'s docstring for how that shape was found: a real
+# resumed run whose checkpoint showed `classified` genuinely populated but `next` empty, produced
+# by running the kill/resume test in a loop until one failed with zero pending items instead of
+# the expected set.
+
+
+def test_progress_with_nothing_scheduled_and_no_gate_restarts_not_silently_finishes():
+    """The corrupted shape itself: real work landed (`classified` populated, `stage_log` has two
+    entries) but `next` is empty and the run never reached the gate. Before the fix this read as
+    "already_complete"; the correct read is "this checkpoint cannot be trusted, restart"."""
+    values = {
+        "classified": {"doc-1": {"doc_type": "msa", "confidence": 0.9}},
+        "stage_log": [{"stage": "intake"}, {"stage": "classify"}],
+    }
+    assert resume_strategy(values, ()) == "fresh"
+
+
+def test_progress_with_a_scheduled_task_resumes():
+    values = {"classified": {"doc-1": {}}, "stage_log": [{"stage": "intake"}, {"stage": "classify"}]}
+    assert resume_strategy(values, ("extract",)) == "resumed"
+
+
+def test_no_prior_state_is_fresh():
+    assert resume_strategy({}, ()) == "fresh"
+
+
+def test_a_stage_log_reaching_the_gate_with_nothing_scheduled_is_already_complete():
+    values = {"stage_log": [{"stage": "intake"}, {"stage": "gate"}]}
+    assert resume_strategy(values, ()) == "already_complete"
 
 
 # --------------------------------------------------------------------------------------------

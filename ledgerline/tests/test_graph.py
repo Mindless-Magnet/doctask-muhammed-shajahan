@@ -109,10 +109,6 @@ def test_a_document_that_gives_orders_is_reported_and_obeyed_by_nothing(corpus):
 def test_an_invoice_cannot_write_a_contract_field(corpus):
     msa_id, invoice_id = _seed_standard(corpus)
     # Re-seed the invoice extraction so the model tries to set the liability cap from an invoice.
-    _, text = corpus.documents[invoice_id]
-    index = text.index("6,400.00")
-    from ledgerline.prompting import block_offset
-
     corpus.seed_extract(
         invoice_id,
         "invoice",
@@ -121,8 +117,7 @@ def test_an_invoice_cannot_write_a_contract_field(corpus):
             {
                 "field_path": "contract.liability_cap.amount",
                 "value": 6400,
-                "char_start": index + block_offset(),
-                "char_end": index + len("6,400.00") + block_offset(),
+                "quote": "6,400.00",
                 "confidence": 0.99,
             }
         ],

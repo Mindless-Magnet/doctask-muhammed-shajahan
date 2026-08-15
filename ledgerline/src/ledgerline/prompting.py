@@ -28,13 +28,18 @@ CLASSIFY_SYSTEM = (
 EXTRACT_SYSTEM = (
     "You extract contract and billing facts from one document into a fixed field set.\n"
     "Rules that are not negotiable:\n"
-    "1. Every field you return must include char_start and char_end pointing at the exact "
-    "substring of the source block that states it. Offsets are zero-based into the block content, "
-    "counting from the first character after the opening delimiter line.\n"
-    "2. Quote spans tightly. The span must contain the stated value, not the whole paragraph.\n"
+    "1. Every field you return must include a quote: the exact substring of the source block that "
+    "states it, copied character for character. Do not count characters, do not describe a "
+    "location, do not paraphrase the quote — copy it verbatim from the source.\n"
+    "2. Quote tightly. The quote must contain the stated value, not the whole paragraph.\n"
     "3. If the document does not state a field, put its name in not_stated. Never infer, never "
-    "carry a value over from general knowledge, and never return a field you cannot point at.\n"
-    "4. Return only fields from the requested list.\n" + _FRAME
+    "carry a value over from general knowledge, and never return a field you cannot quote "
+    "verbatim.\n"
+    "4. Return only fields from the requested list.\n"
+    "5. A field in the list may show a <placeholder> segment in angle brackets, naming a repeated "
+    "entity (one rate row, one invoice, one purchase order). Emit one field per real instance in "
+    "the document, with the placeholder replaced by that instance's own identifier as printed "
+    "there. Never return a field path containing a literal '<' or '>'.\n" + _FRAME
 )
 
 JUDGE_SYSTEM = (
@@ -66,8 +71,9 @@ def data_block(text: str) -> str:
 def block_offset() -> int:
     """Characters preceding the source text inside the wrapped block.
 
-    Extraction returns offsets relative to the block content. This is what converts them back to
-    offsets into the canonical document, which is what every citation is stored against.
+    Used only where a model still returns raw offsets: `examine_judge`'s span for a triggered
+    finding. Extraction no longer needs this — it asks for a quote and locates it with `str.find`
+    against the canonical document directly, which is exact where offsets from a model are not.
     """
     return len(DATA_OPEN) + 1
 
@@ -81,11 +87,30 @@ def classify_user_content(text: str, filename: str, doc_types: tuple[str, ...]) 
 
 
 def extract_user_content(text: str, doc_type: str, field_paths: list[str]) -> str:
-    fields = "\n".join(f"- {path}" for path in field_paths)
+    fields = "\n".join(f"- {_describe_field_path(path)}" for path in field_paths)
     return (
         f"Document type: {doc_type}\n"
         f"Fields to extract:\n{fields}\n\n"
         f"{data_block(text)}"
+    )
+
+
+def _describe_field_path(path: str) -> str:
+    """Render one field path for the extraction prompt.
+
+    A path holding a <placeholder> segment is a template, not a literal field name — it names a
+    repeated entity (one rate row, one invoice, one purchase order). Handed to the model as-is, it
+    comes back verbatim as a field path named `<n>`, which is neither writable nor meaningful. This
+    spells out the substitution instead of leaving it implicit.
+    """
+    if "<" not in path or ">" not in path:
+        return path
+    start, end = path.index("<"), path.index(">") + 1
+    placeholder = path[start:end]
+    label = placeholder[1:-1].replace("_", " ")
+    return (
+        f"{path}  (one field per {label} in the document; replace {placeholder} with that "
+        f"{label}'s own identifier as printed there — never the literal text {placeholder})"
     )
 
 

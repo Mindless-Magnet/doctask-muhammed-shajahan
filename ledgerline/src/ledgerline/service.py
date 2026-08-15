@@ -119,6 +119,37 @@ class RunOutcome:
     degraded: bool
 
 
+def resume_strategy(snapshot_values: dict[str, Any], snapshot_next: tuple[str, ...]) -> str:
+    """Decide how to re-enter the graph for a thread: `"fresh"`, `"resumed"`, or `"already_complete"`.
+
+    Getting this wrong is the difference between resuming, restarting, and silently doing nothing.
+    Passing a fresh input state to a thread that already has state re-enters at START and replays
+    every completed node (`"fresh"`). Passing `None` continues from the last checkpoint
+    (`"resumed"`). A thread with state and nothing left scheduled is already finished, so
+    re-executing it is a no-op (`"already_complete"`).
+
+    `snapshot_next` alone is not trusted to mean "nothing left to do". The SQLite checkpointer
+    commits a step's channel values and the writes that schedule its next task as separate
+    transactions; a process killed between the two leaves a checkpoint whose values show real
+    progress (a document correctly classified, say) but whose `next` reads empty — indistinguishable
+    at that field alone from a run that actually reached the gate. Found by running the kill/resume
+    test in a loop until a resumed run silently produced zero pending items instead of the expected
+    ones. The stage log reaching "gate" is the only signal of real completion trusted here; anything
+    else with `next` empty is a checkpoint that cannot be trusted to resume from, so it restarts
+    instead of silently doing nothing. A restart is safe: every stage is idempotent, and the gate's
+    dedupe key already makes re-proposing an item it has seen before a no-op
+    (`test_the_second_run_reproposes_nothing_it_already_committed`).
+    """
+    reached_gate = any(
+        entry.get("stage") == "gate" for entry in snapshot_values.get("stage_log", [])
+    )
+    if snapshot_values and snapshot_next:
+        return "resumed"
+    if snapshot_values and reached_gate:
+        return "already_complete"
+    return "fresh"
+
+
 def execute_run(run_id: str, settings: Settings | None = None) -> RunOutcome:
     """Run the graph to the gate. Idempotent under resume: the checkpointer skips finished nodes."""
     settings = settings or get_settings()
@@ -154,21 +185,8 @@ def execute_run(run_id: str, settings: Settings | None = None) -> RunOutcome:
         graph = build_graph(context, checkpointer)
         config = {"configurable": {"thread_id": run_id}}
         snapshot = graph.get_state(config)
-
-        # Three cases, and getting this wrong is the difference between resuming and starting over.
-        # Passing an input dict to a thread that already has state re-enters at START and replays
-        # every completed node. Passing None continues from the last checkpoint. A thread with
-        # state and nothing left to do is already finished, so re-executing it is a no-op rather
-        # than a second run.
-        if snapshot.values and not snapshot.next:
-            resumed = "already_complete"
-            entry: Any = None
-        elif snapshot.values:
-            resumed = "resumed"
-            entry = None
-        else:
-            resumed = "fresh"
-            entry = empty_state(run_id, pile_id, document_ids)
+        resumed = resume_strategy(snapshot.values, snapshot.next)
+        entry: Any = None if resumed != "fresh" else empty_state(run_id, pile_id, document_ids)
 
         if resumed != "already_complete":
             node_started = time.perf_counter()

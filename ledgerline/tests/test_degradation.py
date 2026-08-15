@@ -116,13 +116,13 @@ def test_the_judge_never_falls_back_into_the_extractors_family():
     assert settings.model_cheap not in recorder.calls
 
 
-def test_the_judge_and_the_extractor_are_different_model_families():
-    """A verifier that shares the extractor's architecture shares its failure modes. Asserting the
-    families differ keeps a later config change from silently collapsing the two."""
+def test_the_judge_runs_on_its_own_tier_and_never_borrows_the_extractors():
+    """Cross-family verification was the goal and Bedrock would not allow it: the non-Amazon
+    families available here either reject forced tool use or are legacy. What is still enforced is
+    that the judge is its own tier with no fallback, so it can never quietly become the extractor's
+    own call. Prompt independence survives; architectural independence does not."""
     settings = Settings()
-    family = lambda model_id: model_id.split(".")[1]  # noqa: E731
-    assert family(settings.model_deep) != family(settings.model_standard)
-
+    assert settings.model_fallbacks["deep"] == []
 
 def test_when_every_tier_is_gone_the_caller_is_told_not_lied_to():
     settings = Settings(retry_base_delay_seconds=0, max_model_retries=1)

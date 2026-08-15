@@ -28,6 +28,7 @@ PRICES: dict[str, Price] = {
     "us.amazon.nova-pro-v1:0": Price(0.0008, 0.0032),
     "us.meta.llama4-maverick-17b-instruct-v1:0": Price(0.00024, 0.00097),
     "us.mistral.pixtral-large-2502-v1:0": Price(0.002, 0.006),
+    "us.amazon.nova-2-lite-v1:0": Price(0.00006, 0.00024),
 }
 
 

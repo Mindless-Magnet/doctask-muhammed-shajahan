@@ -29,7 +29,6 @@ from ledgerline.prompting import (
     EXTRACT_SYSTEM,
     JUDGE_SYSTEM,
     READ_SPAN_SYSTEM,
-    block_offset,
     classify_user_content,
     extract_user_content,
     judge_user_content,
@@ -184,19 +183,18 @@ class Corpus:
         tighten: bool = False,
         raw_fields: list[dict] | None = None,
     ) -> None:
-        """`fields` are (field_path, value, needle). The needle is located in the real document
-        text, so the fixture's spans are genuine offsets and the verifier does real work."""
+        """`fields` are (field_path, value, needle). The needle must be a real substring of the
+        document text, so the fixture's quote is genuine and the verifier does real work locating
+        and grading it."""
         _, text = self.documents[document_id]
-        shift = block_offset()
         payload = []
         for field_path, value, needle in fields:
-            index = text.index(needle)
+            assert needle in text, f"needle {needle!r} is not in the seeded document text"
             payload.append(
                 {
                     "field_path": field_path,
                     "value": value,
-                    "char_start": index + shift,
-                    "char_end": index + len(needle) + shift,
+                    "quote": needle,
                     "confidence": 0.95,
                 }
             )

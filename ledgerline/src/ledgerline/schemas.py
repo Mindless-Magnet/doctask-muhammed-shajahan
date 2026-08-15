@@ -63,10 +63,17 @@ class Evidence(BaseModel):
 
 
 class ExtractedField(BaseModel):
+    """`quote` is what the model returns: the literal cited substring. `char_start`/`char_end` are
+    not part of the model's output shape (see `EXTRACT_SCHEMA`) — the caller locates the quote in
+    the document and fills them in before this is handed to `verify_fields`. Models cannot count
+    characters reliably; they can copy a substring verbatim, which `str.find` then locates exactly.
+    """
+
     field_path: str
     value: Any = None
-    char_start: int
-    char_end: int
+    quote: str = ""
+    char_start: int = 0
+    char_end: int = 0
     confidence: float = 1.0
 
 
@@ -141,11 +148,10 @@ EXTRACT_SCHEMA: dict[str, Any] = {
                 "properties": {
                     "field_path": {"type": "string"},
                     "value": {},
-                    "char_start": {"type": "integer", "minimum": 0},
-                    "char_end": {"type": "integer", "minimum": 1},
+                    "quote": {"type": "string"},
                     "confidence": {"type": "number", "minimum": 0, "maximum": 1},
                 },
-                "required": ["field_path", "value", "char_start", "char_end", "confidence"],
+                "required": ["field_path", "value", "quote", "confidence"],
             },
         },
         "not_stated": {"type": "array", "items": {"type": "string"}},

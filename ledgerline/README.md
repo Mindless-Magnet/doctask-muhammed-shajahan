@@ -129,6 +129,43 @@ the database rather than in application code, because only the database can sett
 The pattern in all three: a test that compares results cannot find them. Each needed a test that
 asserts on how the work happened.
 
+## Two more bugs a live run found that the tests could not
+
+Both shipped past 84 green tests. Both showed up in the first run against real Bedrock.
+
+**The model was asked to count characters.** `EXTRACT_SCHEMA` asked for `char_start`/`char_end`
+into the source block, and the prompt told the model to compute them by counting from the
+delimiter. Models cannot count characters reliably; every offset came back approximately right,
+which against a citation is simply wrong. On an 11-document live run this meant 65 of the run's
+~76 extracted claims failed deterministic verification on the first pass, retried on every single
+document, and needed the judge to confirm values a human could read in the first paragraph — 76 of
+101 model calls and roughly three quarters of the run's cost, spent compensating for broken input.
+Fixed by asking for the exact quoted text instead of an offset, and locating it in the document
+with `str.find`, which is exact where a model's arithmetic is not (`resolve_extracted_field` in
+`agent/stages.py`, `ExtractedField`/`EXTRACT_SCHEMA` in `schemas.py`). A quote that resolves to
+nothing is now a stronger rejection signal than a bad offset ever was: a hallucinated citation,
+named as such, rather than a span that merely points slightly to the left of the truth. The test
+suite could not see this because `Corpus.seed_extract` built each fixture's offsets the same way
+the prompt told the model to compute its own: locate the needle, add `block_offset()`. A systematic
+offset error and the harness computing "the right answer" the same broken way agree with each other
+by construction; only a model actually attempting the arithmetic disagrees with itself.
+
+**Template field names reached the model as field names.** `FIELD_SETS` uses placeholders like
+`rate_table.<n>.unit_price` to mean "one entry per rate row." Handed to the model verbatim as the
+name of a field to extract, it came back exactly as verbatim: a field literally named
+`rate_table.<n>.unit_price`, which the write allowlist could not match and which landed in
+`unsupported_claims` under a name nothing downstream recognises. Fixed by spelling out the
+substitution in the rendered prompt (`_describe_field_path` in `prompting.py`) and by rejecting
+outright any field path still containing `<` or `>` after extraction, naming it as an unsubstituted
+placeholder rather than an ordinary out-of-scope write. No test caught this because every existing
+fixture was seeded with the field path already resolved (`invoices.INV-2205.amount`), which is what
+a person writing a fixture does and not what a model filling in a template does.
+
+Confirmed on a live run of a 5-document pile: 11 model calls, $0.0086, zero `verify_judge` calls and
+zero `extract_retry` calls, against a baseline of 101 calls, $0.075, 65 judge calls and 11 retries
+on 11 documents before the fix. Every contract, invoice and purchase-order field the corpus states
+landed as a proposed update with a real citation; `unsupported_claims` was empty.
+
 ## What an update actually costs
 
 Measured, from `test_a_new_invoice_costs_an_update_not_a_rerun`. A pile of two documents is
@@ -170,6 +207,15 @@ reviewer should treat them that way.
 
 There is no auth beyond a single bearer token and no multi-tenancy. Out of scope for this build and
 not half-built.
+
+The checkpointer's own durability has a gap that is not SQLite-specific. `langgraph` commits a
+step's channel values and the writes that schedule its next task as two separate transactions, in
+both `SqliteSaver` and `PostgresSaver` — confirmed by reading `put()`/`put_writes()` in both
+packages, not assumed from one dialect behaving worse than the other. A process killed between the
+two leaves a checkpoint that shows real progress but reads as finished. `service.resume_strategy`
+closes this by refusing to trust "nothing scheduled" as proof of completion unless the stage log
+actually reached the gate, and it does so identically for both checkpointers, since the defect
+was never a SQLite one to begin with.
 
 ## Scope boundary
 

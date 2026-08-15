@@ -1,0 +1,8 @@
+INVOICE INV-3301
+
+Vendor: Northwind Logistics Group
+Invoice date: 2025-04-04
+
+Quantity: 60 pallets at a unit price of 132.50 each.
+Total due: 7,950.00
+Purchase order reference: PO-2001

@@ -53,6 +53,7 @@ from ledgerline.schemas import (
 from ledgerline.security.injection import scan
 from ledgerline.verification import (
     Grade,
+    RejectedField,
     VerifiedField,
     apply_judgement,
     reject_unjudged,
@@ -243,6 +244,66 @@ def route_after_classify(state: RunState) -> str:
 # --------------------------------------------------------------------------------------------
 
 
+_NOT_STATED_SENTINELS = frozenset({"not_stated", "not stated", "n/a", "none", ""})
+
+
+def _is_not_stated_sentinel(quote: str) -> bool:
+    """True if `quote` is the model saying "not stated" through the wrong slot.
+
+    Asked to put an absent field's name in `not_stated` instead of `fields`, a model sometimes
+    answers the question correctly but in the wrong place: it keeps the field in `fields` and
+    puts a stand-in like "not_stated" or "N/A" where a real quote belongs. That is a schema-shaped
+    answer in the wrong slot, not a hallucinated citation, and it is a class of failure — any
+    sentinel value could show up here — not a single string to special-case.
+    """
+    return quote.strip().lower().replace("_", " ") in _NOT_STATED_SENTINELS
+
+
+def resolve_extracted_field(
+    field: ExtractedField, canonical: CanonicalDocument
+) -> tuple[ExtractedField | None, RejectedField | None]:
+    """Locate a model-returned quote in the document, or explain why it can't be trusted.
+
+    Three failure modes here have nothing to do with span verification and are caught before it:
+    a field path still holding an unsubstituted `<placeholder>` (the model echoed the template
+    instead of filling it in); a not-stated sentinel where a quote belongs (the model answered
+    correctly through the wrong slot, and this must not read as a lie about the field); and a
+    quote that never appears in the source at all for any other reason — a genuine hallucinated
+    citation, which is a stronger rejection signal than a bad offset ever was and is not weakened
+    by the sentinel carve-out above it. A quote that recurs is still a true citation; the first
+    occurrence is used, since nothing in the request lets the model prefer one occurrence over
+    another.
+    """
+    if "<" in field.field_path or ">" in field.field_path:
+        return None, RejectedField(
+            field.field_path,
+            field.value,
+            f"the model returned an unsubstituted placeholder field path ({field.field_path!r}); "
+            "it must replace the placeholder with the real identifier from the document",
+        )
+
+    # Checked before the lookup, not after a failed one: an empty quote finds index 0 in any
+    # document, and "none" or "n/a" could coincidentally appear as a real word. The sentinel is a
+    # claim about the model's intent, not about where the text happens to sit.
+    if _is_not_stated_sentinel(field.quote):
+        return None, RejectedField(
+            field.field_path, field.value, "not stated in this source", not_stated=True
+        )
+
+    index = canonical.text.find(field.quote)
+    if index == -1:
+        return None, RejectedField(
+            field.field_path,
+            field.value,
+            f"the quoted text {field.quote!r} does not appear in the source document; "
+            "this is a hallucinated citation",
+        )
+
+    field.char_start = index
+    field.char_end = index + len(field.quote)
+    return field, None
+
+
 def _extract_once(
     context: StageContext,
     document_id: str,
@@ -282,24 +343,30 @@ def _extract_once(
 
     permitted: list[ExtractedField] = []
     blocked: list[dict[str, Any]] = []
+    quote_rejected: list[RejectedField] = []
     for field in result.fields:
-        if path_allowed(doc_type, field.field_path):
-            permitted.append(field)
-        else:
+        resolved, rejection = resolve_extracted_field(field, canonical)
+        if rejection is not None:
+            quote_rejected.append(rejection)
+            continue
+        if not path_allowed(doc_type, resolved.field_path):
             blocked.append(
                 {
                     "document_id": document_id,
                     "filename": filename,
                     "doc_type": doc_type,
-                    "field_path": field.field_path,
+                    "field_path": resolved.field_path,
                     "reason": (
-                        f"A document of type '{doc_type}' may not write '{field.field_path}'. "
+                        f"A document of type '{doc_type}' may not write '{resolved.field_path}'. "
                         "Proposal dropped at the write boundary and reported."
                     ),
                 }
             )
+            continue
+        permitted.append(resolved)
 
-    report = verify_fields(permitted, canonical, document_id, offset_shift=block_offset())
+    report = verify_fields(permitted, canonical, document_id)
+    report.rejected = quote_rejected + report.rejected
     if report.needs_judgement:
         try:
             report = apply_judgement(report, ModelSpanReader(context.client))
@@ -312,6 +379,7 @@ def _extract_once(
             "value": item.value,
             "reason": item.reason,
             "document_id": document_id,
+            "not_stated": item.not_stated,
         }
         for item in report.rejected
     ]

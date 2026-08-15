@@ -13,8 +13,16 @@ path change and an unbounded loop is a bug.
 
 The checkpointer is chosen from the database URL. Postgres in production and in the concurrency
 tests; SQLite for local runs and for CI, where it still persists to a file and therefore still
-survives a process being killed. Both are real durability; only the concurrency guarantees differ,
-and the tests that depend on those are marked accordingly.
+survives a process being killed.
+
+Neither backend commits a step's channel values and the writes that schedule its next task
+atomically together — `langgraph`'s pregel loop calls `checkpointer.put()` and
+`checkpointer.put_writes()` as two separate calls regardless of dialect, and both `SqliteSaver`
+and `PostgresSaver` commit each one on its own. A process killed between them leaves a checkpoint
+whose values show real progress but whose scheduled-next-task info is missing — this is a property
+of both backends, not a SQLite shortcut, so `service.resume_strategy` does not trust `next` being
+empty as proof of completion; it also checks that the stage log actually reached the gate. See its
+docstring for how this was found and why the fix does not distinguish by dialect.
 """
 
 from __future__ import annotations

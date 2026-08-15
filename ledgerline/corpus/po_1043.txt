@@ -1,0 +1,4 @@
+PURCHASE ORDER PO-1043
+
+Issued to Northwind Logistics Group on 2025-05-20.
+Committed amount: 9,000.00

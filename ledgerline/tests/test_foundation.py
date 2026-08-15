@@ -10,6 +10,7 @@ from pathlib import Path
 
 import pytest
 
+from ledgerline.agent.stages import resolve_extracted_field
 from ledgerline.ingest.extract_text import UnsupportedFormatError, extract
 from ledgerline.register.reconcile import (
     FieldSnapshot,
@@ -355,6 +356,85 @@ def test_block_offsets_are_shifted_back_to_document_offsets(txt_document):
     )
     assert report.all_passed
     assert report.verified[0].evidence.char_start == index
+
+
+# --------------------------------------------------------------------------------------------
+# Quote resolution
+# --------------------------------------------------------------------------------------------
+
+
+def test_a_quoted_span_is_located_by_exact_text_not_offsets(txt_document):
+    """Models cannot count characters reliably; they can copy a substring verbatim. Resolution
+    must locate that substring itself rather than trust any offset the model might also send."""
+    field = ExtractedField(
+        field_path="contract.payment_terms.net_days", value=60, quote="net 60 days"
+    )
+    resolved, rejection = resolve_extracted_field(field, txt_document)
+    assert rejection is None
+    index = txt_document.text.index("net 60 days")
+    assert resolved.char_start == index
+    assert resolved.char_end == index + len("net 60 days")
+
+
+def test_a_quote_not_present_in_the_document_is_rejected_as_hallucinated(txt_document):
+    field = ExtractedField(
+        field_path="contract.payment_terms.net_days",
+        value=60,
+        quote="net 90 days from delivery",
+    )
+    resolved, rejection = resolve_extracted_field(field, txt_document)
+    assert resolved is None
+    assert "does not appear in the source document" in rejection.reason
+    assert "hallucinated" in rejection.reason
+    assert rejection.not_stated is False
+
+
+@pytest.mark.parametrize(
+    "quote", ["not_stated", "not stated", "N/A", "None", "", "  NOT_STATED  "]
+)
+def test_a_not_stated_sentinel_is_classified_as_absence_not_hallucination(txt_document, quote):
+    """Asked to put an absent field's name in `not_stated`, a model sometimes answers correctly
+    but through the wrong slot: it leaves the field in `fields` and puts a stand-in like
+    "not_stated" or "N/A" where a quote belongs. That is not a lie about the document and must not
+    read as one, and it must not cost a retry the way a real bad citation does."""
+    field = ExtractedField(field_path="contract.payment_terms.net_days", value=None, quote=quote)
+    resolved, rejection = resolve_extracted_field(field, txt_document)
+    assert resolved is None
+    assert rejection.not_stated is True
+    assert rejection.reason == "not stated in this source"
+
+
+def test_a_genuinely_unresolvable_quote_is_still_refused_not_waved_through(txt_document):
+    """The sentinel carve-out narrows the label on one specific case; it must not loosen the
+    refusal for everything else that fails to resolve."""
+    field = ExtractedField(
+        field_path="contract.payment_terms.net_days", value=60, quote="the moon is made of cheese"
+    )
+    resolved, rejection = resolve_extracted_field(field, txt_document)
+    assert resolved is None
+    assert rejection.not_stated is False
+    assert "hallucinated" in rejection.reason
+
+
+def test_a_repeated_quote_resolves_to_its_first_occurrence(tmp_path: Path):
+    path = tmp_path / "repeat.txt"
+    path.write_text("Net 30 days applies to Exhibit A. Net 30 days applies to Exhibit B.\n")
+    document = extract(path)
+    field = ExtractedField(field_path="a", value="Net 30 days", quote="Net 30 days")
+    resolved, rejection = resolve_extracted_field(field, document)
+    assert rejection is None
+    assert resolved.char_start == document.text.index("Net 30 days")
+
+
+def test_an_unsubstituted_placeholder_field_path_is_rejected(txt_document):
+    """`rate_table.<n>.unit_price` is a template, not a field name. A model that echoes it back
+    verbatim did not do the substitution the prompt asked for."""
+    field = ExtractedField(
+        field_path="rate_table.<n>.unit_price", value=100, quote="net 60 days"
+    )
+    resolved, rejection = resolve_extracted_field(field, txt_document)
+    assert resolved is None
+    assert "unsubstituted placeholder" in rejection.reason
 
 
 # --------------------------------------------------------------------------------------------

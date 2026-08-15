@@ -30,7 +30,7 @@ class Settings(BaseSettings):
     # The judge is deliberately a different model family from the extractor. A verifier that shares
     # the extractor's architecture shares its failure modes and is not an independent check: a
     # correlated hallucination would have to occur twice, in two families, to reach the register.
-    model_deep: str = "us.meta.llama4-maverick-17b-instruct-v1:0"
+    model_deep: str = "us.amazon.nova-2-lite-v1:0"
 
     # Fallback chain used when a tier throttles or errors. Empty means degrade straight to
     # deterministic-only mode.

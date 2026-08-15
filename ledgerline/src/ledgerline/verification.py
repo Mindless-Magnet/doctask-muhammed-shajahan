@@ -64,6 +64,11 @@ class RejectedField:
     field_path: str
     value: Any
     reason: str
+    # True when the model reported absence rather than a wrong citation — the caller's own
+    # `not_stated` list, or a value shaped the same way in the wrong slot (see
+    # `agent.stages.resolve_extracted_field`). Kept separate from `reason` because it changes
+    # behaviour (no retry), not just wording.
+    not_stated: bool = False
 
 
 @dataclass(slots=True)

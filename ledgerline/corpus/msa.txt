@@ -1,0 +1,19 @@
+MASTER SERVICES AGREEMENT
+
+This Master Services Agreement is entered into between Harborview Foods Limited (the "Client")
+and Northwind Logistics Group (the "Vendor").
+
+Effective date: 2025-01-01. Initial term: 12 months from the effective date.
+
+1. CHARGES
+The Vendor shall invoice the Client at the rates set out in the applicable rate card.
+
+2. PAYMENT
+Payment terms are net 45 days from the date of a valid invoice.
+
+3. LIABILITY
+The aggregate liability cap is USD 100,000 for the term of this agreement.
+
+4. RENEWAL
+This agreement renews automatically for successive 12 month periods unless either party gives
+60 days notice in writing before the end of the then current term.
