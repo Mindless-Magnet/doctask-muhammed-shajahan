@@ -1,0 +1,46 @@
+services:
+  db:
+    image: pgvector/pgvector:pg16
+    environment:
+      POSTGRES_USER: ledgerline
+      POSTGRES_PASSWORD: ledgerline
+      POSTGRES_DB: ledgerline
+    ports: ["5432:5432"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ledgerline"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+
+  migrate:
+    build: .
+    command: ["ledgerline", "init-db"]
+    environment: &env
+      LEDGERLINE_DATABASE_URL: postgresql+psycopg://ledgerline:ledgerline@db:5432/ledgerline
+      LEDGERLINE_MODEL_CLIENT: ${LEDGERLINE_MODEL_CLIENT:-replay}
+      LEDGERLINE_AWS_REGION: ${AWS_REGION:-us-east-1}
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID:-}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY:-}
+      AWS_SESSION_TOKEN: ${AWS_SESSION_TOKEN:-}
+      LEDGERLINE_API_TOKEN: ${LEDGERLINE_API_TOKEN:-dev-token}
+    depends_on:
+      db: {condition: service_healthy}
+
+  api:
+    build: .
+    command: ["uvicorn", "ledgerline.api.app:app", "--host", "0.0.0.0", "--port", "8000"]
+    environment: *env
+    ports: ["8000:8000"]
+    depends_on:
+      migrate: {condition: service_completed_successfully}
+
+  worker:
+    build: .
+    command: ["ledgerline", "worker"]
+    environment: *env
+    depends_on:
+      migrate: {condition: service_completed_successfully}
+    # Two workers, so the claim path is exercised the way it runs in production rather than only
+    # in tests. SKIP LOCKED means they never take the same run.
+    deploy:
+      replicas: 2

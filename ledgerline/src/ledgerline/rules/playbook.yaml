@@ -1,0 +1,95 @@
+# Contract playbook. A new rule, client or threshold is a change to this file and nothing else.
+#
+# tier: deterministic  runs in Python over the register, zero model calls, always first
+# tier: judge          runs a model against one clause, only for questions determinism cannot settle
+#
+# Every rule carries an id that appears in findings and in the ledger, so a reviewer can trace a
+# finding back to the exact rule that produced it and change that rule without touching code.
+
+version: "1"
+name: "Harborview Foods standard vendor playbook"
+
+rules:
+  - id: PAY_TERMS_MAX
+    title: "Payment terms must not exceed net 45"
+    severity: breach
+    tier: deterministic
+    check:
+      type: numeric_max
+      field: contract.payment_terms.net_days
+      limit: 45
+    message: "Payment terms are net {value}, above the net {limit} ceiling in the playbook."
+
+  - id: CAP_STATED
+    title: "A liability cap must be stated"
+    severity: breach
+    tier: deterministic
+    check:
+      type: required
+      field: contract.liability_cap.amount
+    message: "No liability cap is stated anywhere in the file."
+
+  - id: AUTORENEW_NOTICE
+    title: "Auto-renewal requires at least 60 days notice"
+    severity: breach
+    tier: deterministic
+    check:
+      type: conditional_numeric_min
+      condition_field: contract.renewal.type
+      condition_equals: "auto"
+      field: contract.renewal.notice_days
+      limit: 60
+    message: "Auto-renewal is in force with only {value} days notice, below the {limit} day floor."
+
+  - id: SPEND_CAP
+    title: "Invoiced total must stay within the SOW spend cap"
+    severity: breach
+    tier: deterministic
+    check:
+      type: aggregate_max
+      pattern: "invoices.*.amount"
+      limit_field: contract.spend_cap.amount
+    message: "Invoiced total {value} exceeds the stated spend cap of {limit}."
+
+  - id: INVOICE_PO_REF
+    title: "Every invoice must reference a purchase order in the file"
+    severity: warn
+    tier: deterministic
+    check:
+      type: reference_exists
+      pattern: "invoices.*.po_ref"
+      target_pattern: "purchase_orders.*.number"
+    message: "Invoice references PO {value}, which does not appear anywhere in the file."
+
+  - id: RATE_CONSISTENCY
+    title: "Invoiced unit price must match the rate in force on the invoice date"
+    severity: breach
+    tier: deterministic
+    check:
+      type: rate_consistency
+      invoice_price_pattern: "invoices.*.unit_price"
+      invoice_date_pattern: "invoices.*.date"
+      rate_pattern: "rate_table.*.unit_price"
+      rate_effective_pattern: "rate_table.*.effective_from"
+    message: "Invoice billed {value} but the rate in force on that date was {limit}."
+
+  - id: NOTICE_DEADLINE
+    title: "Termination or non-renewal notice must be sent before the deadline"
+    severity: breach
+    tier: deterministic
+    check:
+      type: date_before
+      field: notice.sent_date
+      limit_field: derived.notice_deadline
+    message: "Notice was sent on {value}, after the deadline of {limit}."
+
+  - id: UNILATERAL_INDEMNITY
+    title: "Indemnity should not run in one direction only"
+    severity: warn
+    tier: judge
+    applies_to_doc_types: [msa, amendment]
+    rule_text: >
+      Does this document contain an indemnity obligation that binds only one party, with no
+      reciprocal obligation on the other? Answer triggered=true only if the one-sidedness is
+      stated in the text you cite.
+    message: "Indemnity appears to run in one direction only."
