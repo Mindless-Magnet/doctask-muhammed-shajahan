@@ -1,0 +1,15 @@
+{
+  "data": {
+    "confidence": 0.95,
+    "doc_type": "invoice",
+    "reason": "The document contains typical invoice elements such as invoice number, vendor, invoice date, quantity, unit price, total due, and a purchase order reference."
+  },
+  "input_tokens": 726,
+  "key": "7ec5c442adf418c7eea92b7df82c94a8",
+  "latency_ms": 943,
+  "model_id": "us.amazon.nova-lite-v1:0",
+  "output_tokens": 58,
+  "recorded_prices_at": "2026-08-15",
+  "request_preview": "Filename: inv_cloud_101.txt\nPermitted types: msa, amendment, sow, rate_card, purchase_order, invoice, notice, correspondence, unknown\n\n<<<SOURCE_DOCUMENT_BEGIN>>>\nINVOICE INV-CLOUD-101\n\nVendor: Vantage Cloud Services Inc\nInvoice date: 2025-04-01\n\nQuantity: 120 seats at a unit price of 42.00 each.\nTotal due: 5,040.00\nPurchase order reference: PO-5001\n<<<SOURCE_DOCUMENT_END>>>",
+  "stage": "classify"
+}

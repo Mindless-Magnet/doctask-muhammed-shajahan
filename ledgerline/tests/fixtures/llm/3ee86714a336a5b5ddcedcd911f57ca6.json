@@ -1,0 +1,15 @@
+{
+  "data": {
+    "confidence": 0.95,
+    "doc_type": "amendment",
+    "reason": "The document explicitly states 'AMENDMENT NO. 2 TO THE MASTER SERVICES AGREEMENT' and details a specific change to an existing agreement."
+  },
+  "input_tokens": 706,
+  "key": "3ee86714a336a5b5ddcedcd911f57ca6",
+  "latency_ms": 1068,
+  "model_id": "us.amazon.nova-lite-v1:0",
+  "output_tokens": 58,
+  "recorded_prices_at": "2026-08-15",
+  "request_preview": "Filename: amendment_2.txt\nPermitted types: msa, amendment, sow, rate_card, purchase_order, invoice, notice, correspondence, unknown\n\n<<<SOURCE_DOCUMENT_BEGIN>>>\nAMENDMENT NO. 2 TO THE MASTER SERVICES AGREEMENT\n\nThis amendment is dated 2025-09-01.\n\nClause 4 is amended so that the notice period for non-renewal is 30 days rather than 60 days.\n\nAll other terms remain unchanged.\n<<<SOURCE_DOCUMENT_END>",
+  "stage": "classify"
+}

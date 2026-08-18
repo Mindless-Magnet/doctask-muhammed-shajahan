@@ -1,0 +1,15 @@
+{
+  "data": {
+    "confidence": 0.95,
+    "doc_type": "invoice",
+    "reason": "The document contains typical invoice elements such as vendor information, invoice date, quantity, unit price, total due, and a purchase order reference."
+  },
+  "input_tokens": 724,
+  "key": "fbcfa26a57f2c103284ef73891c20587",
+  "latency_ms": 1070,
+  "model_id": "us.amazon.nova-lite-v1:0",
+  "output_tokens": 56,
+  "recorded_prices_at": "2026-08-15",
+  "request_preview": "Filename: inv_3302.txt\nPermitted types: msa, amendment, sow, rate_card, purchase_order, invoice, notice, correspondence, unknown\n\n<<<SOURCE_DOCUMENT_BEGIN>>>\nINVOICE INV-3302\n\nVendor: Northwind Logistics Group\nInvoice date: 2025-05-09\n\nQuantity: 55 pallets at a unit price of 132.50 each.\nTotal due: 7,287.50\nPurchase order reference: PO-2001\n<<<SOURCE_DOCUMENT_END>>>",
+  "stage": "classify"
+}

@@ -1,0 +1,15 @@
+{
+  "data": {
+    "confidence": 0.95,
+    "doc_type": "purchase_order",
+    "reason": "The document contains a clear header 'PURCHASE ORDER' and specific details such as the committed amount and issue date, which are typical for a purchase order."
+  },
+  "input_tokens": 693,
+  "key": "d2ab94a9b4a473845f5b93ef911ce953",
+  "latency_ms": 1075,
+  "model_id": "us.amazon.nova-lite-v1:0",
+  "output_tokens": 61,
+  "recorded_prices_at": "2026-08-15",
+  "request_preview": "Filename: po_5001.txt\nPermitted types: msa, amendment, sow, rate_card, purchase_order, invoice, notice, correspondence, unknown\n\n<<<SOURCE_DOCUMENT_BEGIN>>>\nPURCHASE ORDER PO-5001\n\nIssued to Vantage Cloud Services Inc on 2025-02-10.\nCommitted amount: 12,000.00\n<<<SOURCE_DOCUMENT_END>>>",
+  "stage": "classify"
+}

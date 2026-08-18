@@ -556,6 +556,26 @@ def test_rate_consistency_catches_the_stale_rate():
     assert findings[0].field_path == "invoices.INV-2205.unit_price"
 
 
+def test_spend_cap_parses_a_currency_coded_amount():
+    """A spend cap written as "USD 12,000" is real phrasing, found live on the vantage-cloud
+    corpus, where SPEND_CAP silently never fired because _as_number could not parse the currency
+    code preceding the number — a false negative on a rule the playbook advertises as enforced."""
+    playbook = load_playbook(PLAYBOOK)
+    register = _register(
+        {
+            "contract.payment_terms.net_days": 30,
+            "contract.liability_cap.amount": 50000,
+            "contract.spend_cap.amount": "USD 12,000",
+            "invoices.INV-1.amount": "5,040.00",
+            "invoices.INV-2.amount": "5,040.00",
+            "invoices.INV-3.amount": "4,200.00",
+        }
+    )
+    findings = [f for f in evaluate_deterministic(playbook, register) if f.rule_id == "SPEND_CAP"]
+    assert len(findings) == 1
+    assert "12,000" in findings[0].detail
+
+
 def test_orphan_po_reference_is_found():
     playbook = load_playbook(PLAYBOOK)
     register = _register(

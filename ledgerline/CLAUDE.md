@@ -11,11 +11,15 @@ command below.
 
 ```bash
 cd ledgerline
-make up          # docker compose: Postgres+pgvector, API, 2 workers; seeds a pile
+make venv        # once: .venv + editable install. only needed for test/lint/demo-fixtures
+make up          # docker compose: Postgres+pgvector, API, 2 workers, review UI; seeds a pile
+                 # review UI on :5173, API docs on :8000/docs
 make down        # tear down, including the volume
-make test        # pytest -q — 80 tests, offline via replay fixtures, no AWS account/network
+make test        # pytest -q — 110 tests, offline via replay fixtures, no AWS account/network
 make test-pg     # adds 4 Postgres-dialect concurrency tests; needs `docker compose up db` first
 make lint        # ruff check src tests
+make demo-fixtures  # record replay fixtures against live Bedrock; needs credentials, run once
+make web         # review interface with hot reload, against an API already running
 
 pytest tests/test_foundation.py::test_name -q   # run a single test
 
@@ -54,7 +58,20 @@ rather than failing the run). From there:
   run scoped to just the new document(s).
 - **`api/app.py`** (HTTP) and **`mcp/server.py`** (MCP) are both thin wrappers over the same
   functions in `service.py`, including approval — add new behaviour to `service.py`, never to
-  either surface directly, or the two will drift. Auth is a single bearer token; no multi-tenancy.
+  either surface directly, or the two will drift. Auth is a single bearer token defined once in
+  `api/deps.py`; no multi-tenancy.
+- **`.mcp.json`** (repo root) — connects an MCP client to the server; the twelve tools and the
+  full machine-driven flow are documented in the README's "Driving it from a machine" section.
+- **`api/review.py`** — read-only endpoints the review interface needs (pile list, latest run with
+  its proof and cost, per-document classification, and span excerpts with surrounding context).
+  Every route is a read: the interface must never gain an operation the machine surfaces lack, or
+  behaviour 4 stops being true. Auth is declared once at the router, not per route, so a new
+  endpoint in that file cannot ship without it.
+- **`web/`** — the React review interface, covering the whole path (create pile, upload, run,
+  review, commit) so a reviewer never needs a shell (Vite, no router, no state library, plain `fetch`). It
+  calls the same approve/reject/commit endpoints a program calls. `web/src/api.js` is the only
+  place that talks to the API and the only place that parses a proposed-change payload; parsing
+  defensively at each use site is how "every field reads as undefined" spreads.
 - **`llm/client.py`** — one `Protocol`, four implementations: `BedrockClient` (real),
   `RecordingClient` (wraps real, writes fixtures), `ReplayClient` (fixtures only, what the whole
   test suite runs on), `FaultyClient` (injects throttles/errors). Fixtures in

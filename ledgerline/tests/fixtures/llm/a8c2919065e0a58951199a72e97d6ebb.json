@@ -1,0 +1,63 @@
+{
+  "data": {
+    "fields": [
+      {
+        "confidence": 1.0,
+        "field_path": "contract.parties.client",
+        "quote": "Harborview Foods Limited",
+        "value": "Harborview Foods Limited"
+      },
+      {
+        "confidence": 1.0,
+        "field_path": "contract.parties.vendor",
+        "quote": "Calder Freight Services",
+        "value": "Calder Freight Services"
+      },
+      {
+        "confidence": 1.0,
+        "field_path": "contract.effective_date",
+        "quote": "2025-01-01",
+        "value": "2025-01-01"
+      },
+      {
+        "confidence": 1.0,
+        "field_path": "contract.term_months",
+        "quote": "12",
+        "value": 12
+      },
+      {
+        "confidence": 1.0,
+        "field_path": "contract.payment_terms.net_days",
+        "quote": "60",
+        "value": 60
+      },
+      {
+        "confidence": 1.0,
+        "field_path": "contract.liability_cap.amount",
+        "quote": "USD 250,000",
+        "value": "USD 250,000"
+      },
+      {
+        "confidence": 1.0,
+        "field_path": "contract.renewal.type",
+        "quote": "automatically",
+        "value": "automatically"
+      },
+      {
+        "confidence": 1.0,
+        "field_path": "contract.renewal.notice_days",
+        "quote": "60",
+        "value": 60
+      }
+    ],
+    "not_stated": []
+  },
+  "input_tokens": 1030,
+  "key": "a8c2919065e0a58951199a72e97d6ebb",
+  "latency_ms": 4320,
+  "model_id": "us.amazon.nova-pro-v1:0",
+  "output_tokens": 341,
+  "recorded_prices_at": "2026-08-15",
+  "request_preview": "Document type: msa\nFields to extract:\n- contract.parties.client\n- contract.parties.vendor\n- contract.effective_date\n- contract.term_months\n- contract.payment_terms.net_days\n- contract.liability_cap.amount\n- contract.renewal.type\n- contract.renewal.notice_days\n\n<<<SOURCE_DOCUMENT_BEGIN>>>\nMASTER SERVICES AGREEMENT\n\nThis Master Services Agreement is entered into between Harborview Foods Limited (the",
+  "stage": "extract"
+}

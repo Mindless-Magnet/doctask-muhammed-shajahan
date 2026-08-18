@@ -1,0 +1,14 @@
+{
+  "data": {
+    "detail": "The document does not contain any indemnity obligations, one-sided or otherwise. The sections present (Charges, Payment, Liability, Renewal) describe financial terms, liability caps, and renewal mechanics, but there is no mention of any indemnity clause or obligation binding either party.",
+    "triggered": false
+  },
+  "input_tokens": 1284,
+  "key": "0112622067696a88b9bc323822e94cd6",
+  "latency_ms": 1126,
+  "model_id": "us.amazon.nova-2-lite-v1:0",
+  "output_tokens": 86,
+  "recorded_prices_at": "2026-08-15",
+  "request_preview": "Policy rule: Does this document contain an indemnity obligation that binds only one party, with no reciprocal obligation on the other? Answer triggered=true only if the one-sidedness is stated in the text you cite.\n\n\n<<<SOURCE_DOCUMENT_BEGIN>>>\nMASTER SUBSCRIPTION AGREEMENT\n\nThis Master Subscription Agreement is entered into between Fernbridge Retail Ltd (the \"Client\")\nand Vantage Cloud Services I",
+  "stage": "examine_judge"
+}

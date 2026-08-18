@@ -1,0 +1,45 @@
+{
+  "data": {
+    "fields": [
+      {
+        "confidence": 1,
+        "field_path": "invoices.INV-CLOUD-101.amount",
+        "quote": "5,040.00",
+        "value": "5,040.00"
+      },
+      {
+        "confidence": 1,
+        "field_path": "invoices.INV-CLOUD-101.unit_price",
+        "quote": "42.00",
+        "value": "42.00"
+      },
+      {
+        "confidence": 1,
+        "field_path": "invoices.INV-CLOUD-101.quantity",
+        "quote": "120",
+        "value": "120"
+      },
+      {
+        "confidence": 1,
+        "field_path": "invoices.INV-CLOUD-101.date",
+        "quote": "2025-04-01",
+        "value": "2025-04-01"
+      },
+      {
+        "confidence": 1,
+        "field_path": "invoices.INV-CLOUD-101.po_ref",
+        "quote": "PO-5001",
+        "value": "PO-5001"
+      }
+    ],
+    "not_stated": []
+  },
+  "input_tokens": 1117,
+  "key": "eb080ede6926b205e3b3c2f5410fec3b",
+  "latency_ms": 2724,
+  "model_id": "us.amazon.nova-pro-v1:0",
+  "output_tokens": 264,
+  "recorded_prices_at": "2026-08-15",
+  "request_preview": "Document type: invoice\nFields to extract:\n- invoices.<invoice_number>.amount  (one field per invoice number in the document; replace <invoice_number> with that invoice number's own identifier as printed there \u2014 never the literal text <invoice_number>)\n- invoices.<invoice_number>.unit_price  (one field per invoice number in the document; replace <invoice_number> with that invoice number's own ident",
+  "stage": "extract"
+}

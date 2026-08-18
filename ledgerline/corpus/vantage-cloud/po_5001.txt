@@ -1,0 +1,4 @@
+PURCHASE ORDER PO-5001
+
+Issued to Vantage Cloud Services Inc on 2025-02-10.
+Committed amount: 12,000.00

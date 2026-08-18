@@ -1,0 +1,15 @@
+{
+  "data": {
+    "confidence": 0.95,
+    "doc_type": "notice",
+    "reason": "The document is a formal notice of non-renewal of a Master Subscription Agreement, which matches the 'notice' document type."
+  },
+  "input_tokens": 759,
+  "key": "44064f0c163e55f48fbad32437a67193",
+  "latency_ms": 923,
+  "model_id": "us.amazon.nova-lite-v1:0",
+  "output_tokens": 53,
+  "recorded_prices_at": "2026-08-15",
+  "request_preview": "Filename: notice.eml\nPermitted types: msa, amendment, sow, rate_card, purchase_order, invoice, notice, correspondence, unknown\n\n<<<SOURCE_DOCUMENT_BEGIN>>>\nFrom: procurement@fernbridgeretail.example\nTo: legal@vantagecloud.example\nDate: Mon, 05 Jan 2026 10:00:00 +0000\nSubject: Notice of non-renewal, MSA dated 2025-02-01\n\nPlease treat this email as formal notice that Fernbridge Retail Ltd does not i",
+  "stage": "classify"
+}

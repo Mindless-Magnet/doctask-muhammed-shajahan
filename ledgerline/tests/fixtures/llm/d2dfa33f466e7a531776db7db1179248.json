@@ -1,0 +1,15 @@
+{
+  "data": {
+    "confidence": 0.95,
+    "doc_type": "amendment",
+    "reason": "The document explicitly states 'AMENDMENT NO. 1 TO THE MASTER SERVICES AGREEMENT' and includes details of changes to the agreement."
+  },
+  "input_tokens": 753,
+  "key": "d2dfa33f466e7a531776db7db1179248",
+  "latency_ms": 1598,
+  "model_id": "us.amazon.nova-lite-v1:0",
+  "output_tokens": 57,
+  "recorded_prices_at": "2026-08-15",
+  "request_preview": "Filename: amendment_1.txt\nPermitted types: msa, amendment, sow, rate_card, purchase_order, invoice, notice, correspondence, unknown\n\n<<<SOURCE_DOCUMENT_BEGIN>>>\nAMENDMENT NO. 1 TO THE MASTER SERVICES AGREEMENT\n\nThis amendment is dated 2025-06-15 and takes effect on 2025-07-01.\n\nThe unit price for palletised freight is reduced to 145.00 per pallet with effect from\n2025-07-01. The rate of 160.00 per",
+  "stage": "classify"
+}

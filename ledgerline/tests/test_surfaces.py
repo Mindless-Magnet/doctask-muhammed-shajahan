@@ -97,6 +97,11 @@ def test_a_program_drives_the_entire_flow_through_mcp_alone(env, corpus):
 
     status = _payload(_call("get_run_status", run_id=run_id))
     assert status["status"] == RunStatus.awaiting_approval.value
+    # Behaviour 10 has to hold on this surface too: a program driving the flow through MCP alone
+    # must be able to read what its own run cost, not just its outcome.
+    assert status["cost"], "get_run_status returned no cost for a completed run"
+    assert status["cost"].get("total_cost_usd") is not None
+    assert status["cost"].get("by_stage")
 
     pending = _payload(_call("list_pending_items", pile_id=corpus.pile_id, kind="update"))
     assert pending["items"], "nothing to approve"

@@ -1,0 +1,15 @@
+{
+  "data": {
+    "confidence": 0.95,
+    "doc_type": "msa",
+    "reason": "The document is a Master Subscription Agreement, which matches the 'msa' document type."
+  },
+  "input_tokens": 814,
+  "key": "07241ef280420a565e9f2e9ccf856de9",
+  "latency_ms": 1730,
+  "model_id": "us.amazon.nova-lite-v1:0",
+  "output_tokens": 47,
+  "recorded_prices_at": "2026-08-15",
+  "request_preview": "Filename: msa.txt\nPermitted types: msa, amendment, sow, rate_card, purchase_order, invoice, notice, correspondence, unknown\n\n<<<SOURCE_DOCUMENT_BEGIN>>>\nMASTER SUBSCRIPTION AGREEMENT\n\nThis Master Subscription Agreement is entered into between Fernbridge Retail Ltd (the \"Client\")\nand Vantage Cloud Services Inc (the \"Vendor\").\n\nEffective date: 2025-02-01. Initial term: 12 months from the effective d",
+  "stage": "classify"
+}

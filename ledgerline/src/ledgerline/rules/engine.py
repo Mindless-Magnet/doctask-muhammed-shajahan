@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import fnmatch
 import hashlib
+import re
 from dataclasses import dataclass
 from datetime import date
 from pathlib import Path
@@ -141,13 +142,24 @@ class Register:
         return f"{path.rsplit('.', 1)[0]}.{sibling_leaf}"
 
 
+_CURRENCY_WORD = re.compile(r"^[A-Za-z]{2,3}\s+|\s+[A-Za-z]{2,3}$")
+
+
 def _as_number(value: Any) -> float | None:
+    """Parse a monetary value the way a document actually states one, not just a bare digit.
+
+    A spend cap stated as "USD 12,000" is a real, common phrasing, and a rule that goes quiet
+    because it cannot parse the currency code that precedes the number is a false negative, not a
+    conservative default — found live, on a document phrased exactly this way, which
+    `test_spend_cap_parses_a_currency_coded_amount` below pins down.
+    """
     if isinstance(value, bool):
         return None
     if isinstance(value, (int, float)):
         return float(value)
     if isinstance(value, str):
         cleaned = value.replace(",", "").replace("$", "").strip()
+        cleaned = _CURRENCY_WORD.sub("", cleaned).strip()
         try:
             return float(cleaned)
         except ValueError:

@@ -1,0 +1,63 @@
+{
+  "data": {
+    "fields": [
+      {
+        "confidence": 1,
+        "field_path": "contract.parties.client",
+        "quote": "Fernbridge Retail Ltd",
+        "value": "Fernbridge Retail Ltd"
+      },
+      {
+        "confidence": 1,
+        "field_path": "contract.parties.vendor",
+        "quote": "Vantage Cloud Services Inc",
+        "value": "Vantage Cloud Services Inc"
+      },
+      {
+        "confidence": 1,
+        "field_path": "contract.effective_date",
+        "quote": "2025-02-01",
+        "value": "2025-02-01"
+      },
+      {
+        "confidence": 1,
+        "field_path": "contract.term_months",
+        "quote": "12 months",
+        "value": 12
+      },
+      {
+        "confidence": 1,
+        "field_path": "contract.payment_terms.net_days",
+        "quote": "net 30 days",
+        "value": 30
+      },
+      {
+        "confidence": 1,
+        "field_path": "contract.liability_cap.amount",
+        "quote": "USD 50,000",
+        "value": 50000
+      },
+      {
+        "confidence": 1,
+        "field_path": "contract.renewal.type",
+        "quote": "automatically",
+        "value": "automatically"
+      },
+      {
+        "confidence": 1,
+        "field_path": "contract.renewal.notice_days",
+        "quote": "45 days",
+        "value": 45
+      }
+    ],
+    "not_stated": []
+  },
+  "input_tokens": 1036,
+  "key": "41fcaee5a07fed3977111b0f9dfbb17c",
+  "latency_ms": 3477,
+  "model_id": "us.amazon.nova-pro-v1:0",
+  "output_tokens": 325,
+  "recorded_prices_at": "2026-08-15",
+  "request_preview": "Document type: msa\nFields to extract:\n- contract.parties.client\n- contract.parties.vendor\n- contract.effective_date\n- contract.term_months\n- contract.payment_terms.net_days\n- contract.liability_cap.amount\n- contract.renewal.type\n- contract.renewal.notice_days\n\n<<<SOURCE_DOCUMENT_BEGIN>>>\nMASTER SUBSCRIPTION AGREEMENT\n\nThis Master Subscription Agreement is entered into between Fernbridge Retail Ltd",
+  "stage": "extract"
+}

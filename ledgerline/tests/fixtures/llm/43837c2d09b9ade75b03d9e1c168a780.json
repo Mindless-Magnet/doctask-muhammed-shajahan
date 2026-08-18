@@ -1,0 +1,15 @@
+{
+  "data": {
+    "confidence": 0.95,
+    "doc_type": "purchase_order",
+    "reason": "The document contains a clear header 'PURCHASE ORDER' and specifies a committed amount, which are typical elements of a purchase order."
+  },
+  "input_tokens": 693,
+  "key": "43837c2d09b9ade75b03d9e1c168a780",
+  "latency_ms": 944,
+  "model_id": "us.amazon.nova-lite-v1:0",
+  "output_tokens": 56,
+  "recorded_prices_at": "2026-08-15",
+  "request_preview": "Filename: po_2001.txt\nPermitted types: msa, amendment, sow, rate_card, purchase_order, invoice, notice, correspondence, unknown\n\n<<<SOURCE_DOCUMENT_BEGIN>>>\nPURCHASE ORDER PO-2001\n\nIssued to Northwind Logistics Group on 2025-02-11.\nCommitted amount: 40,000.00\n<<<SOURCE_DOCUMENT_END>>>",
+  "stage": "classify"
+}

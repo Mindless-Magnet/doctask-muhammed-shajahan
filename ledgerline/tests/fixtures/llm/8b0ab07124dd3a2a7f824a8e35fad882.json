@@ -1,0 +1,32 @@
+{
+  "data": {
+    "fields": [
+      {
+        "confidence": 1.0,
+        "field_path": "purchase_orders.PO-1042.number",
+        "quote": "PO-1042",
+        "value": "PO-1042"
+      },
+      {
+        "confidence": 1.0,
+        "field_path": "purchase_orders.PO-1042.amount",
+        "quote": "12,000.00",
+        "value": "12,000.00"
+      },
+      {
+        "confidence": 1.0,
+        "field_path": "purchase_orders.PO-1042.issued_date",
+        "quote": "2025-01-08",
+        "value": "2025-01-08"
+      }
+    ]
+  },
+  "input_tokens": 998,
+  "key": "8b0ab07124dd3a2a7f824a8e35fad882",
+  "latency_ms": 1932,
+  "model_id": "us.amazon.nova-pro-v1:0",
+  "output_tokens": 179,
+  "recorded_prices_at": "2026-08-15",
+  "request_preview": "Document type: purchase_order\nFields to extract:\n- purchase_orders.<po_number>.number  (one field per po number in the document; replace <po_number> with that po number's own identifier as printed there \u2014 never the literal text <po_number>)\n- purchase_orders.<po_number>.amount  (one field per po number in the document; replace <po_number> with that po number's own identifier as printed there \u2014 nev",
+  "stage": "extract"
+}

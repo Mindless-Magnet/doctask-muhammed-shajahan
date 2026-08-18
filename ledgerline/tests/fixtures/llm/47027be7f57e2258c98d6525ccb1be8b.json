@@ -1,0 +1,32 @@
+{
+  "data": {
+    "fields": [
+      {
+        "confidence": 1.0,
+        "field_path": "notice.type",
+        "quote": "Notice of non-renewal",
+        "value": "Notice of non-renewal"
+      },
+      {
+        "confidence": 1.0,
+        "field_path": "notice.sent_date",
+        "quote": "Notice sent date: 2026-01-05.",
+        "value": "2026-01-05"
+      },
+      {
+        "confidence": 1.0,
+        "field_path": "notice.effective_date",
+        "quote": "not_stated",
+        "value": "not_stated"
+      }
+    ]
+  },
+  "input_tokens": 935,
+  "key": "47027be7f57e2258c98d6525ccb1be8b",
+  "latency_ms": 1828,
+  "model_id": "us.amazon.nova-pro-v1:0",
+  "output_tokens": 145,
+  "recorded_prices_at": "2026-08-15",
+  "request_preview": "Document type: notice\nFields to extract:\n- notice.type\n- notice.sent_date\n- notice.effective_date\n\n<<<SOURCE_DOCUMENT_BEGIN>>>\nFrom: procurement@fernbridgeretail.example\nTo: legal@vantagecloud.example\nDate: Mon, 05 Jan 2026 10:00:00 +0000\nSubject: Notice of non-renewal, MSA dated 2025-02-01\n\nPlease treat this email as formal notice that Fernbridge Retail Ltd does not intend to renew the\nMaster Sub",
+  "stage": "extract"
+}

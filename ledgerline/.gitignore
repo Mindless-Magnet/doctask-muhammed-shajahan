@@ -6,3 +6,6 @@ storage/
 inbox/
 node_modules/
 .pytest_cache/
+.ruff_cache/
+dist/
+web/dist/

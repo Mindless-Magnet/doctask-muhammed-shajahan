@@ -1,0 +1,15 @@
+{
+  "data": {
+    "confidence": 0.95,
+    "doc_type": "notice",
+    "reason": "The document is a formal notice of non-renewal of a Master Services Agreement (MSA), which matches the 'notice' document type."
+  },
+  "input_tokens": 763,
+  "key": "4d8c3c0050ef337276aff87cc020ccdf",
+  "latency_ms": 862,
+  "model_id": "us.amazon.nova-lite-v1:0",
+  "output_tokens": 55,
+  "recorded_prices_at": "2026-08-15",
+  "request_preview": "Filename: notice.eml\nPermitted types: msa, amendment, sow, rate_card, purchase_order, invoice, notice, correspondence, unknown\n\n<<<SOURCE_DOCUMENT_BEGIN>>>\nFrom: contracts@harborviewfoods.example\nTo: legal@northwindlogistics.example\nDate: Mon, 08 Dec 2025 09:14:00 +0000\nSubject: Notice of non-renewal, MSA dated 2025-01-01\n\nPlease treat this email as formal notice that Harborview Foods Limited does",
+  "stage": "classify"
+}

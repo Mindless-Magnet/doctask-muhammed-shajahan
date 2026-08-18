@@ -1,0 +1,39 @@
+{
+  "data": {
+    "fields": [
+      {
+        "confidence": 1.0,
+        "field_path": "contract.spend_cap.amount",
+        "quote": "USD 12,000",
+        "value": "USD 12,000"
+      },
+      {
+        "confidence": 1.0,
+        "field_path": "contract.payment_terms.net_days",
+        "quote": "net 15 days",
+        "value": "15"
+      },
+      {
+        "confidence": 1.0,
+        "field_path": "sow.number",
+        "quote": "OF-001",
+        "value": "OF-001"
+      },
+      {
+        "confidence": 1.0,
+        "field_path": "sow.scope",
+        "quote": "cloud platform subscription, up to 120 seats.",
+        "value": "cloud platform subscription, up to 120 seats."
+      }
+    ],
+    "not_stated": []
+  },
+  "input_tokens": 907,
+  "key": "53e16878a9f840f8b3ccdd29259982e8",
+  "latency_ms": 2066,
+  "model_id": "us.amazon.nova-pro-v1:0",
+  "output_tokens": 200,
+  "recorded_prices_at": "2026-08-15",
+  "request_preview": "Document type: sow\nFields to extract:\n- contract.spend_cap.amount\n- contract.payment_terms.net_days\n- sow.number\n- sow.scope\n\n<<<SOURCE_DOCUMENT_BEGIN>>>\nSTATEMENT OF WORK OF-001\n\nReference: Master Subscription Agreement between Fernbridge Retail Ltd and Vantage Cloud Services\nInc.\n\nScope: cloud platform subscription, up to 120 seats.\n\nTotal spend under this statement of work shall not exceed USD ",
+  "stage": "extract"
+}

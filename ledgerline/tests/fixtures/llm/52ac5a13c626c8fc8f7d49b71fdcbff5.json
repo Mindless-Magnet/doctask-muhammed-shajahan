@@ -1,0 +1,15 @@
+{
+  "data": {
+    "confidence": 0.9,
+    "doc_type": "purchase_order",
+    "reason": "The document specifies a subscription order with a committed spend and payment terms, which are typical elements of a purchase order."
+  },
+  "input_tokens": 722,
+  "key": "52ac5a13c626c8fc8f7d49b71fdcbff5",
+  "latency_ms": 848,
+  "model_id": "us.amazon.nova-lite-v1:0",
+  "output_tokens": 52,
+  "recorded_prices_at": "2026-08-15",
+  "request_preview": "Filename: order_form_001.txt\nPermitted types: msa, amendment, sow, rate_card, purchase_order, invoice, notice, correspondence, unknown\n\n<<<SOURCE_DOCUMENT_BEGIN>>>\nORDER FORM OF-001\n\nReference: Master Subscription Agreement between Fernbridge Retail Ltd and Vantage Cloud Services\nInc.\n\nScope: cloud platform subscription, up to 120 seats.\n\nTotal committed spend under this order form shall not excee",
+  "stage": "classify"
+}

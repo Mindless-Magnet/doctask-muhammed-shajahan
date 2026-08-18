@@ -1,0 +1,14 @@
+{
+  "data": {
+    "detail": "The document is an amendment to a Master Subscription Agreement that only addresses changes to the per-seat monthly rate. It contains no indemnity clauses or obligations of any kind, reciprocal or one-sided. Therefore, the policy rule regarding a one-sided indemnity obligation is not triggered.",
+    "triggered": false
+  },
+  "input_tokens": 1215,
+  "key": "07cb72e212f1fc9e9d28dde1ae641d51",
+  "latency_ms": 1034,
+  "model_id": "us.amazon.nova-2-lite-v1:0",
+  "output_tokens": 86,
+  "recorded_prices_at": "2026-08-15",
+  "request_preview": "Policy rule: Does this document contain an indemnity obligation that binds only one party, with no reciprocal obligation on the other? Answer triggered=true only if the one-sidedness is stated in the text you cite.\n\n\n<<<SOURCE_DOCUMENT_BEGIN>>>\nAMENDMENT NO. 1 TO THE MASTER SUBSCRIPTION AGREEMENT\n\nThis amendment is dated 2025-07-10 and takes effect on 2025-08-01.\n\nThe per-seat monthly rate is redu",
+  "stage": "examine_judge"
+}

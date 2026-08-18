@@ -1,0 +1,15 @@
+{
+  "data": {
+    "confidence": 0.95,
+    "doc_type": "amendment",
+    "reason": "The document explicitly states 'AMENDMENT NO. 1 TO THE MASTER SUBSCRIPTION AGREEMENT' and includes details of changes to the subscription rate, which is characteristic of an amendment document."
+  },
+  "input_tokens": 752,
+  "key": "c5aefbefbf8d78a1dba13047863556dd",
+  "latency_ms": 1857,
+  "model_id": "us.amazon.nova-lite-v1:0",
+  "output_tokens": 68,
+  "recorded_prices_at": "2026-08-15",
+  "request_preview": "Filename: amendment_1.txt\nPermitted types: msa, amendment, sow, rate_card, purchase_order, invoice, notice, correspondence, unknown\n\n<<<SOURCE_DOCUMENT_BEGIN>>>\nAMENDMENT NO. 1 TO THE MASTER SUBSCRIPTION AGREEMENT\n\nThis amendment is dated 2025-07-10 and takes effect on 2025-08-01.\n\nThe per-seat monthly rate is reduced to 35.00 per seat with effect from 2025-08-01. The rate of\n42.00 per seat ceases",
+  "stage": "classify"
+}

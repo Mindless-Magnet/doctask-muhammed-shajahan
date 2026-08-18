@@ -1,0 +1,8 @@
+INVOICE INV-CLOUD-310
+
+Vendor: Vantage Cloud Services Inc
+Invoice date: 2025-11-01
+
+Quantity: 120 seats at a unit price of 35.00 each.
+Total due: 4,200.00
+Purchase order reference: PO-9999

@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "ledgerline": {
+      "command": "ledgerline/.venv/bin/python",
+      "args": ["-m", "ledgerline.mcp.server"],
+      "env": {
+        "LEDGERLINE_DATABASE_URL": "postgresql+psycopg://ledgerline:ledgerline@localhost:5432/ledgerline",
+        "LEDGERLINE_MODEL_CLIENT": "replay"
+      }
+    }
+  }
+}

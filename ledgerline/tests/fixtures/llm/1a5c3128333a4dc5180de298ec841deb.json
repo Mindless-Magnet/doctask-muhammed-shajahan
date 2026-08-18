@@ -1,0 +1,15 @@
+{
+  "data": {
+    "confidence": 0.95,
+    "doc_type": "sow",
+    "reason": "The document contains a clear title 'STATEMENT OF WORK', references a 'Master Subscription Agreement', and specifies the scope, total spend, and payment terms, which are all typical elements of a Statement of Work."
+  },
+  "input_tokens": 725,
+  "key": "1a5c3128333a4dc5180de298ec841deb",
+  "latency_ms": 859,
+  "model_id": "us.amazon.nova-lite-v1:0",
+  "output_tokens": 73,
+  "recorded_prices_at": "2026-08-15",
+  "request_preview": "Filename: sow_of_001.txt\nPermitted types: msa, amendment, sow, rate_card, purchase_order, invoice, notice, correspondence, unknown\n\n<<<SOURCE_DOCUMENT_BEGIN>>>\nSTATEMENT OF WORK OF-001\n\nReference: Master Subscription Agreement between Fernbridge Retail Ltd and Vantage Cloud Services\nInc.\n\nScope: cloud platform subscription, up to 120 seats.\n\nTotal spend under this statement of work shall not excee",
+  "stage": "classify"
+}

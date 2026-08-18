@@ -1,0 +1,38 @@
+{
+  "data": {
+    "fields": [
+      {
+        "confidence": 1.0,
+        "field_path": "sow.number",
+        "quote": "SOW-002",
+        "value": "SOW-002"
+      },
+      {
+        "confidence": 1.0,
+        "field_path": "sow.scope",
+        "quote": "palletised ambient freight between the Client's Rotherham depot and its regional stores.",
+        "value": "palletised ambient freight between the Client's Rotherham depot and its regional stores."
+      },
+      {
+        "confidence": 1.0,
+        "field_path": "contract.spend_cap.amount",
+        "quote": "USD 75,000",
+        "value": "USD 75,000"
+      },
+      {
+        "confidence": 1.0,
+        "field_path": "contract.payment_terms.net_days",
+        "quote": "net 30 days",
+        "value": "net 30 days"
+      }
+    ]
+  },
+  "input_tokens": 911,
+  "key": "51b65d22a1a7ef0a72b0c83cd01d5af1",
+  "latency_ms": 2526,
+  "model_id": "us.amazon.nova-pro-v1:0",
+  "output_tokens": 211,
+  "recorded_prices_at": "2026-08-15",
+  "request_preview": "Document type: sow\nFields to extract:\n- contract.spend_cap.amount\n- contract.payment_terms.net_days\n- sow.number\n- sow.scope\n\n<<<SOURCE_DOCUMENT_BEGIN>>>\nSTATEMENT OF WORK SOW-002\n\nReference: Master Services Agreement between Harborview Foods Limited and Northwind Logistics Group.\n\nScope: palletised ambient freight between the Client's Rotherham depot and its regional stores.\n\nTotal spend under th",
+  "stage": "extract"
+}

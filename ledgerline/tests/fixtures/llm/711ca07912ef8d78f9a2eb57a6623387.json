@@ -1,0 +1,14 @@
+{
+  "data": {
+    "detail": "The document only amends the notice period for non-renewal from 60 days to 30 days and states that all other terms remain unchanged. There is no mention of any indemnity obligation, let alone a one-sided indemnity obligation without reciprocal terms. Therefore, the policy rule is not triggered.",
+    "triggered": false
+  },
+  "input_tokens": 1181,
+  "key": "711ca07912ef8d78f9a2eb57a6623387",
+  "latency_ms": 1774,
+  "model_id": "us.amazon.nova-2-lite-v1:0",
+  "output_tokens": 91,
+  "recorded_prices_at": "2026-08-15",
+  "request_preview": "Policy rule: Does this document contain an indemnity obligation that binds only one party, with no reciprocal obligation on the other? Answer triggered=true only if the one-sidedness is stated in the text you cite.\n\n\n<<<SOURCE_DOCUMENT_BEGIN>>>\nAMENDMENT NO. 2 TO THE MASTER SERVICES AGREEMENT\n\nThis amendment is dated 2025-09-01.\n\nClause 4 is amended so that the notice period for non-renewal is 30 ",
+  "stage": "examine_judge"
+}

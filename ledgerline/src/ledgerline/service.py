@@ -224,6 +224,7 @@ def execute_run(run_id: str, settings: Settings | None = None) -> RunOutcome:
         run.degraded = bool(final.get("degraded"))
         run.degraded_reason = final.get("degraded_reason")
         run.stage_timings = {**stage_timings, "total_seconds": round(elapsed, 3)}
+        run.stage_log = final.get("stage_log", [])
         run.cost_report = client.cost_report()
         session.commit()
         outcome = RunOutcome(

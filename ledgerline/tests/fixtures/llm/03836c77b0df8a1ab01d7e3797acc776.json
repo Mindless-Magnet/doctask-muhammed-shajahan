@@ -1,0 +1,15 @@
+{
+  "data": {
+    "confidence": 0.95,
+    "doc_type": "msa",
+    "reason": "The document is clearly a Master Services Agreement based on the title and content, which includes terms like 'Effective date', 'Initial term', 'CHARGES', 'PAYMENT', 'LIABILITY', and 'RENEWAL'."
+  },
+  "input_tokens": 808,
+  "key": "03836c77b0df8a1ab01d7e3797acc776",
+  "latency_ms": 2131,
+  "model_id": "us.amazon.nova-lite-v1:0",
+  "output_tokens": 79,
+  "recorded_prices_at": "2026-08-15",
+  "request_preview": "Filename: msa.txt\nPermitted types: msa, amendment, sow, rate_card, purchase_order, invoice, notice, correspondence, unknown\n\n<<<SOURCE_DOCUMENT_BEGIN>>>\nMASTER SERVICES AGREEMENT\n\nThis Master Services Agreement is entered into between Harborview Foods Limited (the \"Client\")\nand Calder Freight Services (the \"Vendor\").\n\nEffective date: 2025-01-01. Initial term: 12 months from the effective date.\n\n1.",
+  "stage": "classify"
+}

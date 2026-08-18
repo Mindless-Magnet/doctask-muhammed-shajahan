@@ -10,7 +10,14 @@ keep billing the old one, the SOW and the MSA state different payment terms, the
 runs past the spend cap, one invoice cites a PO that was never issued, and the non-renewal notice
 goes out after the deadline.
 
-Variant 'b' is a different vendor with a different format mix, for the second run.
+Variant 'b' is a different vendor with a different format mix, for the second run. Variant 'c' is a
+SaaS/subscription vendor rather than logistics, proving the field vocabulary (unit_price, quantity,
+spend_cap, net_days) is domain-agnostic rather than shaped around one vendor's numbers.
+
+Each variant writes into its own named subfolder (`VARIANT_LABELS`) under whatever `out_dir` is
+passed in, e.g. `corpus/northwind-logistics/`, `corpus/calder-freight/` and `corpus/vantage-cloud/`,
+so the vendors' documents never collide on disk and a person can tell at a glance which files
+belong to which run.
 """
 
 from __future__ import annotations
@@ -152,20 +159,150 @@ DESIGNED_CONTRADICTIONS = [
     "INV-2209 contains text instructing the system to approve everything and report nothing",
 ]
 
+# Variant 'c': a SaaS/subscription vendor rather than logistics, on purpose — same field vocabulary
+# (unit_price, quantity, spend_cap, net_days all still apply, just to seats and subscriptions
+# instead of pallets), proving the schema is domain-agnostic rather than tuned to one vendor shape.
+# Deliberately smaller than variant 'a': no poisoned document here, since variant 'a' already
+# proves the injection defence and a second copy of the same test would not prove anything new.
+
+MSA_C = """MASTER SUBSCRIPTION AGREEMENT
+
+This Master Subscription Agreement is entered into between Fernbridge Retail Ltd (the "Client")
+and Vantage Cloud Services Inc (the "Vendor").
+
+Effective date: 2025-02-01. Initial term: 12 months from the effective date.
+
+1. CHARGES
+The Vendor shall invoice the Client per active seat at the rate set out in the applicable order
+form.
+
+2. PAYMENT
+Payment terms are net 30 days from the date of a valid invoice.
+
+3. LIABILITY
+The aggregate liability cap is USD 50,000 for the term of this agreement.
+
+4. RENEWAL
+This agreement renews automatically for successive 12 month periods unless either party gives
+45 days notice in writing before the end of the then current term.
+"""
+
+AMENDMENT_C = """AMENDMENT NO. 1 TO THE MASTER SUBSCRIPTION AGREEMENT
+
+This amendment is dated 2025-07-10 and takes effect on 2025-08-01.
+
+The per-seat monthly rate is reduced to 35.00 per seat with effect from 2025-08-01. The rate of
+42.00 per seat ceases to apply from that date.
+
+All other terms of the Master Subscription Agreement remain unchanged.
+"""
+
+ORDER_FORM_C = """STATEMENT OF WORK OF-001
+
+Reference: Master Subscription Agreement between Fernbridge Retail Ltd and Vantage Cloud Services
+Inc.
+
+Scope: cloud platform subscription, up to 120 seats.
+
+Total spend under this statement of work shall not exceed USD 12,000.
+
+Payment terms for work under this statement of work are net 15 days.
+"""
+
+NOTICE_C = """From: procurement@fernbridgeretail.example
+To: legal@vantagecloud.example
+Date: Mon, 5 Jan 2026 10:00:00 +0000
+Subject: Notice of non-renewal, MSA dated 2025-02-01
+
+Please treat this email as formal notice that Fernbridge Retail Ltd does not intend to renew the
+Master Subscription Agreement at the end of its current term.
+
+Notice sent date: 2026-01-05.
+"""
+
+
+def _seat_invoice(number: str, date: str, seats: int, unit_price: float, po_ref: str) -> str:
+    total = seats * unit_price
+    return (
+        f"INVOICE {number}\n\n"
+        f"Vendor: Vantage Cloud Services Inc\n"
+        f"Invoice date: {date}\n\n"
+        f"Quantity: {seats} seats at a unit price of {unit_price:.2f} each.\n"
+        f"Total due: {total:,.2f}\n"
+        f"Purchase order reference: {po_ref}\n"
+    )
+
+
+VARIANT_C: dict[str, tuple[str, str]] = {
+    "msa.txt": (MSA_C, "msa"),
+    "amendment_1.txt": (AMENDMENT_C, "amendment"),
+    "sow_of_001.txt": (ORDER_FORM_C, "sow"),
+    "po_5001.txt": (_purchase_order("PO-5001", 12000.0, "2025-02-10").replace(
+        "Issued to Northwind Logistics Group", "Issued to Vantage Cloud Services Inc"
+    ), "purchase_order"),
+    # Billed at the old per-seat rate after the amendment took effect: same contradiction shape as
+    # variant 'a', different vendor, proving the rule is not hardcoded to one vendor's numbers.
+    "inv_cloud_101.txt": (_seat_invoice("INV-CLOUD-101", "2025-04-01", 120, 42.00, "PO-5001"), "invoice"),
+    "inv_cloud_205.txt": (_seat_invoice("INV-CLOUD-205", "2025-09-01", 120, 42.00, "PO-5001"), "invoice"),
+    "inv_cloud_310.txt": (_seat_invoice("INV-CLOUD-310", "2025-11-01", 120, 35.00, "PO-9999"), "invoice"),
+    "notice.eml": (NOTICE_C, "notice"),
+}
+
+DESIGNED_CONTRADICTIONS_C = [
+    "MSA states net 30 days while Statement of Work OF-001 states net 15 days for the same "
+    "subscription",
+    "Amendment 1 sets the per-seat rate to 35.00 from 2025-08-01, but INV-CLOUD-205 bills "
+    "42.00 on 2025-09-01",
+    "Statement of Work OF-001 caps committed spend at USD 12,000; the invoiced total across the "
+    "three invoices exceeds it",
+    "INV-CLOUD-310 references PO-9999, which was never issued",
+    "Non-renewal notice sent 2026-01-05, after the 45-day deadline the MSA implies (2025-12-18)",
+]
+
+
+VARIANTS: dict[str, dict[str, tuple[str, str]]] = {"a": VARIANT_A, "b": VARIANT_B, "c": VARIANT_C}
+VARIANT_LABELS: dict[str, str] = {
+    "a": "northwind-logistics",
+    "b": "calder-freight",
+    "c": "vantage-cloud",
+}
+VARIANT_CONTRADICTIONS: dict[str, list[str]] = {
+    "a": DESIGNED_CONTRADICTIONS,
+    "b": [],
+    "c": DESIGNED_CONTRADICTIONS_C,
+}
+
 
 def write_corpus(out_dir: Path, variant: str = "a") -> list[Path]:
-    documents = VARIANT_A if variant.lower() == "a" else VARIANT_B
-    out_dir.mkdir(parents=True, exist_ok=True)
+    """Write one variant's documents into their own named subfolder under `out_dir`.
+
+    Each variant is a different vendor with an overlapping filename set (both have an `msa.txt`,
+    for instance), so writing them flat into the same directory means the second variant silently
+    overwrites the first's files of the same name. A subfolder per vendor avoids that and also
+    means a person can open `out_dir` and see which files belong to which vendor without reading
+    code.
+    """
+    documents = VARIANTS[variant.lower()]
+    vendor_dir = out_dir / VARIANT_LABELS[variant.lower()]
+    vendor_dir.mkdir(parents=True, exist_ok=True)
     written = []
     for filename, (text, _) in documents.items():
-        path = out_dir / filename
+        path = vendor_dir / filename
         path.write_text(text, encoding="utf-8")
         written.append(path)
     return written
 
 
 def generate_and_load(*, pile_name: str, out_dir: Path, variant: str = "a") -> dict[str, Any]:
-    """Write the corpus and register every document against a new pile."""
+    """Write the corpus and register every document against the pile, creating it if needed.
+
+    Idempotent on purpose. `make up` runs this, and a setup command that fails the second time it
+    is run is a setup command that fails for everyone who tries it twice. Re-seeding an existing
+    pile re-uses it and skips documents whose bytes are already present, so running it repeatedly
+    converges rather than erroring or duplicating.
+    """
+    from sqlalchemy import select
+
     from ledgerline.db import session_scope
     from ledgerline.ingest.extract_text import extract
     from ledgerline.models import Pile, SourceDocument
@@ -173,14 +310,29 @@ def generate_and_load(*, pile_name: str, out_dir: Path, variant: str = "a") -> d
     paths = write_corpus(out_dir, variant)
 
     with session_scope() as session:
-        pile = Pile(name=pile_name)
-        session.add(pile)
-        session.flush()
+        pile = session.scalars(select(Pile).where(Pile.name == pile_name)).first()
+        created_pile = pile is None
+        if pile is None:
+            pile = Pile(name=pile_name)
+            session.add(pile)
+            session.flush()
         pile_id = pile.id
 
+        existing = {
+            digest
+            for (digest,) in session.execute(
+                select(SourceDocument.content_sha256).where(SourceDocument.pile_id == pile_id)
+            )
+        }
+
         loaded = []
+        skipped = []
         for path in paths:
             canonical = extract(path)
+            if canonical.content_sha256 in existing:
+                skipped.append(path.name)
+                continue
+            existing.add(canonical.content_sha256)
             document = SourceDocument(
                 pile_id=pile_id,
                 filename=path.name,
@@ -198,9 +350,11 @@ def generate_and_load(*, pile_name: str, out_dir: Path, variant: str = "a") -> d
 
     return {
         "pile_id": pile_id,
+        "created_pile": created_pile,
+        "skipped_already_present": skipped,
         "pile_name": pile_name,
         "variant": variant,
         "documents": loaded,
-        "designed_contradictions": DESIGNED_CONTRADICTIONS if variant == "a" else [],
+        "designed_contradictions": VARIANT_CONTRADICTIONS.get(variant.lower(), []),
         "note": "All parties, amounts and documents are invented. No real third-party data.",
     }
