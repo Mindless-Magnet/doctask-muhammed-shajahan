@@ -4,40 +4,40 @@
       {
         "confidence": 1.0,
         "field_path": "invoices.INV-2207.amount",
-        "quote": "6,525.00",
+        "quote": "Total due: 6,525.00",
         "value": "6,525.00"
       },
       {
         "confidence": 1.0,
         "field_path": "invoices.INV-2207.unit_price",
-        "quote": "145.00",
+        "quote": "unit price of 145.00 each",
         "value": "145.00"
       },
       {
         "confidence": 1.0,
         "field_path": "invoices.INV-2207.quantity",
-        "quote": "45 pallets",
-        "value": "45 pallets"
+        "quote": "Quantity: 45 pallets",
+        "value": "45"
       },
       {
         "confidence": 1.0,
         "field_path": "invoices.INV-2207.date",
-        "quote": "2025-08-28",
+        "quote": "Invoice date: 2025-08-28",
         "value": "2025-08-28"
       },
       {
         "confidence": 1.0,
         "field_path": "invoices.INV-2207.po_ref",
-        "quote": "PO-1043",
+        "quote": "Purchase order reference: PO-1043",
         "value": "PO-1043"
       }
     ]
   },
   "input_tokens": 1116,
   "key": "4868f0711808618e346235c863d8942c",
-  "latency_ms": 2530,
+  "latency_ms": 3291,
   "model_id": "us.amazon.nova-pro-v1:0",
-  "output_tokens": 267,
+  "output_tokens": 285,
   "recorded_prices_at": "2026-08-15",
   "request_preview": "Document type: invoice\nFields to extract:\n- invoices.<invoice_number>.amount  (one field per invoice number in the document; replace <invoice_number> with that invoice number's own identifier as printed there \u2014 never the literal text <invoice_number>)\n- invoices.<invoice_number>.unit_price  (one field per invoice number in the document; replace <invoice_number> with that invoice number's own ident",
   "stage": "extract"

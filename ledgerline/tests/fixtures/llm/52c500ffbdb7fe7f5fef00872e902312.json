@@ -12,20 +12,17 @@
         "field_path": "notice.sent_date",
         "quote": "2025-12-08",
         "value": "2025-12-08"
-      },
-      {
-        "confidence": 1.0,
-        "field_path": "notice.effective_date",
-        "quote": "not_stated",
-        "value": "not_stated"
       }
+    ],
+    "not_stated": [
+      "notice.effective_date"
     ]
   },
   "input_tokens": 939,
   "key": "52c500ffbdb7fe7f5fef00872e902312",
-  "latency_ms": 1672,
+  "latency_ms": 1996,
   "model_id": "us.amazon.nova-pro-v1:0",
-  "output_tokens": 140,
+  "output_tokens": 114,
   "recorded_prices_at": "2026-08-15",
   "request_preview": "Document type: notice\nFields to extract:\n- notice.type\n- notice.sent_date\n- notice.effective_date\n\n<<<SOURCE_DOCUMENT_BEGIN>>>\nFrom: contracts@harborviewfoods.example\nTo: legal@northwindlogistics.example\nDate: Mon, 08 Dec 2025 09:14:00 +0000\nSubject: Notice of non-renewal, MSA dated 2025-01-01\n\nPlease treat this email as formal notice that Harborview Foods Limited does not intend to renew\nthe Mast",
   "stage": "extract"

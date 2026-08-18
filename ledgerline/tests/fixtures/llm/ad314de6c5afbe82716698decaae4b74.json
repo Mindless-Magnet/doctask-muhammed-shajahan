@@ -1,13 +1,13 @@
 {
   "data": {
-    "detail": "The document is an amendment to a Master Services Agreement focusing solely on updating pricing terms for palletised freight. It contains no indemnity clauses or obligations of any kind, reciprocal or one-sided. Therefore, the policy rule regarding a one-sided indemnity obligation is not triggered.",
+    "detail": "The document is an amendment to a Master Services Agreement focusing on price changes for palletised freight. It contains no indemnity clauses or obligations of any kind, reciprocal or one-sided. Therefore, the policy rule regarding a one-sided indemnity obligation is not triggered.",
     "triggered": false
   },
   "input_tokens": 1216,
   "key": "ad314de6c5afbe82716698decaae4b74",
-  "latency_ms": 1099,
+  "latency_ms": 969,
   "model_id": "us.amazon.nova-2-lite-v1:0",
-  "output_tokens": 86,
+  "output_tokens": 84,
   "recorded_prices_at": "2026-08-15",
   "request_preview": "Policy rule: Does this document contain an indemnity obligation that binds only one party, with no reciprocal obligation on the other? Answer triggered=true only if the one-sidedness is stated in the text you cite.\n\n\n<<<SOURCE_DOCUMENT_BEGIN>>>\nAMENDMENT NO. 1 TO THE MASTER SERVICES AGREEMENT\n\nThis amendment is dated 2025-06-15 and takes effect on 2025-07-01.\n\nThe unit price for palletised freight",
   "stage": "examine_judge"

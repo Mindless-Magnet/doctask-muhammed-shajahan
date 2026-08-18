@@ -35,7 +35,7 @@
         "confidence": 1.0,
         "field_path": "contract.liability_cap.amount",
         "quote": "USD 100,000",
-        "value": "USD 100,000"
+        "value": 100000
       },
       {
         "confidence": 1.0,
@@ -49,14 +49,13 @@
         "quote": "60 days",
         "value": 60
       }
-    ],
-    "not_stated": []
+    ]
   },
   "input_tokens": 1031,
   "key": "db879463a09855a05d17a2703afd6edb",
-  "latency_ms": 3470,
+  "latency_ms": 3321,
   "model_id": "us.amazon.nova-pro-v1:0",
-  "output_tokens": 346,
+  "output_tokens": 338,
   "recorded_prices_at": "2026-08-15",
   "request_preview": "Document type: msa\nFields to extract:\n- contract.parties.client\n- contract.parties.vendor\n- contract.effective_date\n- contract.term_months\n- contract.payment_terms.net_days\n- contract.liability_cap.amount\n- contract.renewal.type\n- contract.renewal.notice_days\n\n<<<SOURCE_DOCUMENT_BEGIN>>>\nMASTER SERVICES AGREEMENT\n\nThis Master Services Agreement is entered into between Harborview Foods Limited (the",
   "stage": "extract"

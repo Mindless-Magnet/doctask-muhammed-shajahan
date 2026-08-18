@@ -5,7 +5,7 @@
   },
   "input_tokens": 1181,
   "key": "711ca07912ef8d78f9a2eb57a6623387",
-  "latency_ms": 1774,
+  "latency_ms": 1080,
   "model_id": "us.amazon.nova-2-lite-v1:0",
   "output_tokens": 91,
   "recorded_prices_at": "2026-08-15",

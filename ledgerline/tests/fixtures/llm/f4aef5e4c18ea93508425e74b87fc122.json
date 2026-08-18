@@ -2,13 +2,13 @@
   "data": {
     "confidence": 0.95,
     "doc_type": "sow",
-    "reason": "The document contains a clear title 'STATEMENT OF WORK', references a Master Services Agreement, and outlines the scope and payment terms, which are typical elements of a Statement of Work."
+    "reason": "The document contains a clear title 'STATEMENT OF WORK', references a 'Master Services Agreement', and specifies the scope, total spend, and payment terms, which are typical elements of a Statement of Work."
   },
   "input_tokens": 727,
   "key": "f4aef5e4c18ea93508425e74b87fc122",
-  "latency_ms": 1044,
+  "latency_ms": 1020,
   "model_id": "us.amazon.nova-lite-v1:0",
-  "output_tokens": 66,
+  "output_tokens": 72,
   "recorded_prices_at": "2026-08-15",
   "request_preview": "Filename: sow_001.txt\nPermitted types: msa, amendment, sow, rate_card, purchase_order, invoice, notice, correspondence, unknown\n\n<<<SOURCE_DOCUMENT_BEGIN>>>\nSTATEMENT OF WORK SOW-001\n\nReference: Master Services Agreement between Harborview Foods Limited and Northwind Logistics Group.\n\nScope: palletised ambient freight between the Client's Rotherham depot and its regional stores.\n\nTotal spend under",
   "stage": "classify"

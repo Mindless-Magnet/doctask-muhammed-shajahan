@@ -23,7 +23,7 @@
   },
   "input_tokens": 997,
   "key": "668cf5fa9fafb4f51e8eb23a6996c330",
-  "latency_ms": 1930,
+  "latency_ms": 1942,
   "model_id": "us.amazon.nova-pro-v1:0",
   "output_tokens": 177,
   "recorded_prices_at": "2026-08-15",
