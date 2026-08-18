@@ -14,20 +14,28 @@ services:
 
   migrate:
     build: .
+    volumes:
+      - ${HOME}/.aws:/root/.aws:ro
     command: ["ledgerline", "init-db"]
     environment: &env
       LEDGERLINE_DATABASE_URL: postgresql+psycopg://ledgerline:ledgerline@db:5432/ledgerline
       LEDGERLINE_MODEL_CLIENT: ${LEDGERLINE_MODEL_CLIENT:-replay}
       LEDGERLINE_AWS_REGION: ${AWS_REGION:-us-east-1}
+      # Credentials reach the containers two ways, because people keep them in two places.
+      # Env vars if they are exported; otherwise the shared credentials file mounted below, which
+      # is where `aws configure --profile ledgerline` puts them. Neither is baked into an image.
       AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID:-}
       AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY:-}
       AWS_SESSION_TOKEN: ${AWS_SESSION_TOKEN:-}
+      AWS_PROFILE: ${AWS_PROFILE:-}
       LEDGERLINE_API_TOKEN: ${LEDGERLINE_API_TOKEN:-dev-token}
     depends_on:
       db: {condition: service_healthy}
 
   api:
     build: .
+    volumes:
+      - ${HOME}/.aws:/root/.aws:ro
     command: ["uvicorn", "ledgerline.api.app:app", "--host", "0.0.0.0", "--port", "8000"]
     environment: *env
     ports: ["8000:8000"]
@@ -36,6 +44,8 @@ services:
 
   worker:
     build: .
+    volumes:
+      - ${HOME}/.aws:/root/.aws:ro
     command: ["ledgerline", "worker"]
     environment: *env
     depends_on:
@@ -44,3 +54,14 @@ services:
     # in tests. SKIP LOCKED means they never take the same run.
     deploy:
       replicas: 2
+
+  review:
+    build: ./web
+    ports: ["5173:5173"]
+    environment:
+      # Baked into the bundle at build time, so this is a display token for a local stack and
+      # nothing more. A real deployment would put the API behind a session and never ship a token
+      # to a browser at all.
+      VITE_LEDGERLINE_TOKEN: ${LEDGERLINE_API_TOKEN:-dev-token}
+    depends_on:
+      api: {condition: service_started}

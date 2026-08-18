@@ -1,0 +1,56 @@
+{
+  "data": {
+    "fields": [
+      {
+        "confidence": 1.0,
+        "field_path": "contract.payment_terms.net_days",
+        "quote": "not_stated",
+        "value": "not_stated"
+      },
+      {
+        "confidence": 1.0,
+        "field_path": "contract.term_months",
+        "quote": "not_stated",
+        "value": "not_stated"
+      },
+      {
+        "confidence": 1.0,
+        "field_path": "contract.renewal.type",
+        "quote": "not_stated",
+        "value": "not_stated"
+      },
+      {
+        "confidence": 1.0,
+        "field_path": "contract.renewal.notice_days",
+        "quote": "not_stated",
+        "value": "not_stated"
+      },
+      {
+        "confidence": 1.0,
+        "field_path": "rate_table.1.unit_price",
+        "quote": "145.00 per pallet",
+        "value": "145.00 per pallet"
+      },
+      {
+        "confidence": 1.0,
+        "field_path": "rate_table.1.effective_from",
+        "quote": "2025-07-01",
+        "value": "2025-07-01"
+      }
+    ],
+    "not_stated": [
+      "contract.payment_terms.net_days",
+      "contract.term_months",
+      "contract.renewal.type",
+      "contract.renewal.notice_days"
+    ]
+  },
+  "input_tokens": 1030,
+  "key": "fffc0f6c06693d855b5795cafd9afaa7",
+  "latency_ms": 3255,
+  "model_id": "us.amazon.nova-pro-v1:0",
+  "output_tokens": 307,
+  "recorded_prices_at": "2026-08-15",
+  "request_preview": "Document type: amendment\nFields to extract:\n- contract.payment_terms.net_days\n- contract.term_months\n- contract.renewal.type\n- contract.renewal.notice_days\n- rate_table.<n>.unit_price  (one field per n in the document; replace <n> with that n's own identifier as printed there \u2014 never the literal text <n>)\n- rate_table.<n>.effective_from  (one field per n in the document; replace <n> with that n's ",
+  "stage": "extract"
+}

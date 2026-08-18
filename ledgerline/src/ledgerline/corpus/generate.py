@@ -165,7 +165,15 @@ def write_corpus(out_dir: Path, variant: str = "a") -> list[Path]:
 
 
 def generate_and_load(*, pile_name: str, out_dir: Path, variant: str = "a") -> dict[str, Any]:
-    """Write the corpus and register every document against a new pile."""
+    """Write the corpus and register every document against the pile, creating it if needed.
+
+    Idempotent on purpose. `make up` runs this, and a setup command that fails the second time it
+    is run is a setup command that fails for everyone who tries it twice. Re-seeding an existing
+    pile re-uses it and skips documents whose bytes are already present, so running it repeatedly
+    converges rather than erroring or duplicating.
+    """
+    from sqlalchemy import select
+
     from ledgerline.db import session_scope
     from ledgerline.ingest.extract_text import extract
     from ledgerline.models import Pile, SourceDocument
@@ -173,14 +181,29 @@ def generate_and_load(*, pile_name: str, out_dir: Path, variant: str = "a") -> d
     paths = write_corpus(out_dir, variant)
 
     with session_scope() as session:
-        pile = Pile(name=pile_name)
-        session.add(pile)
-        session.flush()
+        pile = session.scalars(select(Pile).where(Pile.name == pile_name)).first()
+        created_pile = pile is None
+        if pile is None:
+            pile = Pile(name=pile_name)
+            session.add(pile)
+            session.flush()
         pile_id = pile.id
 
+        existing = {
+            digest
+            for (digest,) in session.execute(
+                select(SourceDocument.content_sha256).where(SourceDocument.pile_id == pile_id)
+            )
+        }
+
         loaded = []
+        skipped = []
         for path in paths:
             canonical = extract(path)
+            if canonical.content_sha256 in existing:
+                skipped.append(path.name)
+                continue
+            existing.add(canonical.content_sha256)
             document = SourceDocument(
                 pile_id=pile_id,
                 filename=path.name,
@@ -198,6 +221,8 @@ def generate_and_load(*, pile_name: str, out_dir: Path, variant: str = "a") -> d
 
     return {
         "pile_id": pile_id,
+        "created_pile": created_pile,
+        "skipped_already_present": skipped,
         "pile_name": pile_name,
         "variant": variant,
         "documents": loaded,

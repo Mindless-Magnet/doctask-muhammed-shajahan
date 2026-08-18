@@ -12,17 +12,17 @@ scope for this build and stated as such rather than half-built.
 from __future__ import annotations
 
 import hashlib
-import hmac
-import os
 import shutil
 import tempfile
 from pathlib import Path
-from typing import Annotated, Any
+from typing import Any
 
-from fastapi import Depends, FastAPI, File, Header, HTTPException, UploadFile
+from fastapi import Depends, FastAPI, File, HTTPException, UploadFile
 from pydantic import BaseModel, Field
 from sqlalchemy import select
 
+from ledgerline.api.deps import API_TOKEN, require_token
+from ledgerline.api.review import router as review_router
 from ledgerline.config import get_settings
 from ledgerline.db import session_scope
 from ledgerline.ingest.extract_text import UnsupportedFormatError, extract
@@ -44,7 +44,10 @@ from ledgerline.service import (
     decide_items,
 )
 
-API_TOKEN = os.environ.get("LEDGERLINE_API_TOKEN", "dev-token")
+# Re-exported so existing callers and tests can keep importing it from here. The definition lives
+# in deps.py because the review router needs it too, and two copies of an auth check is how they
+# drift apart.
+__all__ = ["API_TOKEN", "app", "require_token"]
 
 app = FastAPI(
     title="Ledgerline",
@@ -52,12 +55,10 @@ app = FastAPI(
     description="Vendor document file reconciliation with grounded citations and a human gate.",
 )
 
-
-def require_token(authorization: Annotated[str | None, Header()] = None) -> None:
-    supplied = (authorization or "").removeprefix("Bearer ").strip()
-    if not hmac.compare_digest(supplied, API_TOKEN):
-        raise HTTPException(status_code=401, detail="invalid or missing bearer token")
-
+# Read-only endpoints the review interface needs. Kept in their own module so the machine surfaces
+# stay the minimum contract: the interface adds no operation of its own, because approve, reject and
+# commit have to mean the same thing whoever calls them.
+app.include_router(review_router)
 
 Auth = Depends(require_token)
 
@@ -191,7 +192,12 @@ def get_run(run_id: str) -> dict[str, Any]:
             "attempt": run.attempt,
             "degraded": run.degraded,
             "degraded_reason": run.degraded_reason,
+            "error": run.error,
             "stage_timings": run.stage_timings,
+            # What the run decided at each stage, in order. Persisting this and serving it is what
+            # makes "steps we can watch" a property of the system rather than of the CLI that
+            # happened to print it.
+            "stage_log": run.stage_log or [],
             "untouched_proof": None
             if proof is None
             else {

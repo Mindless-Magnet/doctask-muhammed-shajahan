@@ -215,10 +215,23 @@ class ReplayClient:
         key = request.cache_key(model_id)
         path = _fixture_path(self._dir, key)
         if not path.exists():
+            recorded = len(list(self._dir.glob("*.json"))) if self._dir.exists() else 0
+            if recorded == 0:
+                raise FixtureMissError(
+                    f"No recorded model responses at all, so nothing can be replayed "
+                    f"(looked in {self._dir}). "
+                    "Cause: this checkout has no committed fixtures, and replay mode never calls a "
+                    "live model. "
+                    "Fix: either run `make demo-fixtures` once with AWS credentials to record them, "
+                    "or set LEDGERLINE_MODEL_CLIENT=bedrock to call the model directly."
+                )
             raise FixtureMissError(
-                f"No fixture for stage '{request.stage}' key {key}. "
-                f"Cause: the request differs from anything recorded, usually a changed prompt. "
-                f"Fix: re-record with LEDGERLINE_MODEL_CLIENT=record, or revert the prompt change."
+                f"No fixture for stage '{request.stage}' key {key}, though {recorded} other "
+                f"responses are recorded. "
+                "Cause: this exact request differs from anything recorded — a changed prompt, a "
+                "changed model, or a document that was not part of the recorded corpus. "
+                "Fix: re-record with `make demo-fixtures`, or run against the documents the "
+                "fixtures were recorded from."
             )
         payload = json.loads(path.read_text(encoding="utf-8"))
         self.calls.append((request.stage, key))

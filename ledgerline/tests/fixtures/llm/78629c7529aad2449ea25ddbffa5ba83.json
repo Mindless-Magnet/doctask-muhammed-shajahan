@@ -1,0 +1,15 @@
+{
+  "data": {
+    "confidence": 0.95,
+    "doc_type": "purchase_order",
+    "reason": "The document contains a header labeled 'PURCHASE ORDER' and includes specific details such as the order number, date, and committed amount, which are typical for a purchase order."
+  },
+  "input_tokens": 692,
+  "key": "78629c7529aad2449ea25ddbffa5ba83",
+  "latency_ms": 980,
+  "model_id": "us.amazon.nova-lite-v1:0",
+  "output_tokens": 65,
+  "recorded_prices_at": "2026-08-15",
+  "request_preview": "Filename: po_1043.txt\nPermitted types: msa, amendment, sow, rate_card, purchase_order, invoice, notice, correspondence, unknown\n\n<<<SOURCE_DOCUMENT_BEGIN>>>\nPURCHASE ORDER PO-1043\n\nIssued to Northwind Logistics Group on 2025-05-20.\nCommitted amount: 9,000.00\n<<<SOURCE_DOCUMENT_END>>>",
+  "stage": "classify"
+}

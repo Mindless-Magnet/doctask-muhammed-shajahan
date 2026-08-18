@@ -158,6 +158,10 @@ class Run(Base):
     error: Mapped[str | None] = mapped_column(Text, nullable=True)
     cost_report: Mapped[dict[str, Any] | None] = mapped_column(JSONType, nullable=True)
     stage_timings: Mapped[dict[str, Any] | None] = mapped_column(JSONType, nullable=True)
+    # What each stage decided, in order. Behaviour 1 asks the system to show its steps and what it
+    # chose at each one; a decision that is computed and then discarded is not shown to anyone. The
+    # graph builds this in state, so persisting it is what makes it readable after the run ends.
+    stage_log: Mapped[list[dict[str, Any]] | None] = mapped_column(JSONType, nullable=True)
     new_document_ids: Mapped[list[str]] = mapped_column(JSONType, default=list)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=_now, index=True)
     finished_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)

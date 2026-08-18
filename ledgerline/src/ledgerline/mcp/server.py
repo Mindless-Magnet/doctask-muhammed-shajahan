@@ -46,6 +46,96 @@ mcp = _Server("ledgerline")
 
 
 @mcp.tool()
+def list_piles() -> dict[str, Any]:
+    """Every pile, with how many documents it holds and how much is waiting on a person."""
+    from ledgerline.api.review import list_piles as _list
+
+    return _list()
+
+
+@mcp.tool()
+def create_pile(name: str) -> dict[str, Any]:
+    """Create a pile. A pile is one vendor relationship: one contract file, however many documents."""
+    with session_scope() as session:
+        if session.scalars(select(Pile).where(Pile.name == name)).first():
+            return {"error": f"a pile named '{name}' already exists"}
+        pile = Pile(name=name)
+        session.add(pile)
+        session.flush()
+        return {"pile_id": pile.id, "name": pile.name, "register_version": pile.register_version}
+
+
+@mcp.tool()
+def add_document(pile_id: str, path: str) -> dict[str, Any]:
+    """Ingest a document from a local path into a pile.
+
+    This is the ingestion half of behaviour 4: without it a program could drive every stage of the
+    flow except getting documents in, which would make "a machine can run the whole flow" untrue in
+    the one place it is easiest not to notice.
+
+    Content-addressed by sha256, so re-adding the same bytes is a no-op and costs nothing. Takes a
+    path rather than base64 because this server runs beside the files it reads; an agent that has
+    the documents already has the filesystem.
+    """
+    from pathlib import Path
+
+    from ledgerline.ingest.extract_text import UnsupportedFormatError, extract
+    from ledgerline.models import SourceDocument
+
+    source = Path(path).expanduser()
+    if not source.is_file():
+        return {
+            "error": (
+                f"'{path}' is not a file. "
+                "Cause: the path does not resolve from this server's working directory. "
+                "Fix: pass an absolute path."
+            )
+        }
+
+    try:
+        canonical = extract(source)
+    except UnsupportedFormatError as exc:
+        return {"error": str(exc)}
+
+    with session_scope() as session:
+        if session.get(Pile, pile_id) is None:
+            return {"error": f"pile {pile_id} not found"}
+        existing = session.scalars(
+            select(SourceDocument).where(
+                SourceDocument.pile_id == pile_id,
+                SourceDocument.content_sha256 == canonical.content_sha256,
+            )
+        ).first()
+        if existing is not None:
+            return {
+                "document_id": existing.id,
+                "filename": existing.filename,
+                "created": False,
+                "note": "identical bytes were already in this pile; nothing was added",
+            }
+
+        document = SourceDocument(
+            pile_id=pile_id,
+            filename=source.name,
+            content_sha256=canonical.content_sha256,
+            source_format=canonical.source_format,
+            canonical_text=canonical.text,
+            locators=[
+                {"kind": loc.kind, "ref": loc.ref, "start": loc.start, "end": loc.end}
+                for loc in canonical.locators
+            ],
+        )
+        session.add(document)
+        session.flush()
+        return {
+            "document_id": document.id,
+            "filename": document.filename,
+            "characters": len(canonical.text),
+            "created": True,
+        }
+
+
+@mcp.tool()
 def start_run(pile_id: str, document_ids: list[str] | None = None) -> dict[str, Any]:
     """Queue a run over a pile. Returns immediately; poll get_run_status."""
     with session_scope() as session:
@@ -71,7 +161,12 @@ def get_run_status(run_id: str) -> dict[str, Any]:
             "attempt": run.attempt,
             "degraded": run.degraded,
             "degraded_reason": run.degraded_reason,
+            "error": run.error,
             "timings": run.stage_timings,
+            # Every stage the run moved through and what it decided there, including the decisions
+            # that rerouted it. A program driving this system can read the path it took, not just
+            # the outcome.
+            "stage_log": run.stage_log or [],
         }
 
 

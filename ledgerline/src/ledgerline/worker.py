@@ -62,7 +62,7 @@ def run_forever() -> None:
                 outcome.cost_report.get("total_calls", 0),
                 outcome.cost_report.get("total_cost_usd", 0.0),
             )
-        except Exception:
+        except Exception as exc:
             log.exception("run %s failed", run_id)
             with session_scope() as session:
                 from ledgerline.models import Run
@@ -70,7 +70,11 @@ def run_forever() -> None:
                 failed = session.get(Run, run_id)
                 if failed is not None:
                     failed.status = RunStatus.failed
-                    failed.error = "see worker log"
+                    # The actual cause, stored where every surface can read it. "See the worker
+                    # log" is not an error message: it is an instruction to go somewhere the person
+                    # reading it usually cannot reach, which for anyone running this in Docker is
+                    # every time.
+                    failed.error = f"{type(exc).__name__}: {exc}"[:4000]
                     session.commit()
 
 
